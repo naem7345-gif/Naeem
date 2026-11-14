@@ -1,0 +1,6 @@
+{
+  "name": "Spotify - Web Player: Music for everyone",
+  "description": "Desktop web player replica of Spotify featuring the top search bar, responsive sidebar library, personalized home feed, and full playback controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
