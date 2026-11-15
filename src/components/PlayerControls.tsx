@@ -20,7 +20,6 @@ import { Track } from '../types/spotify';
 import { formatTime, calculateProgressPercentage } from '../utils/audioUtils';
 import { SoundPresetId, getPresetConfig } from '../services/audioEnhancer';
 import { CoverArt } from './CoverArt';
-import { BubbleButton } from './BubbleButton';
 
 interface PlayerControlsProps {
   currentTrack: Track | null;
@@ -103,7 +102,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
   return (
     <>
       {/* Mobile Mini-Player Bar (< md) */}
-      <footer className="md:hidden relative mx-2 mb-2 px-3 py-2 bg-[#101824]/92 backdrop-blur-xl border border-cyan-200/20 rounded-2xl flex flex-col select-none z-20 shrink-0 shadow-[0_14px_34px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(186,230,253,0.22)] overflow-visible">
+      <footer className="md:hidden relative mx-2 mb-2 px-3 py-2 bg-[#121721]/92 backdrop-blur-xl border border-white/15 rounded-2xl flex flex-col select-none z-20 shrink-0 shadow-[0_14px_34px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.14)] overflow-hidden">
         {currentTrack ? (
           <div className="flex items-center justify-between gap-2 min-w-0">
             {/* Tappable Left Artwork + Metadata -> Opens Medium Player Card */}
@@ -129,27 +128,24 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
               </div>
             </div>
 
-            {/* Mobile Action Controls — 3D Water Bubble Buttons */}
+            {/* Mobile Action Controls */}
             <div className="flex items-center gap-1 shrink-0">
-              <BubbleButton
-                waterPhase={0}
+              <button
                 onClick={onToggleLike}
                 aria-label={isLiked ? 'Remove from Your Library' : 'Save to Your Library'}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <Heart
                   className={`w-4 h-4 ${
                     isLiked ? 'text-[#1ed760] fill-[#1ed760]' : ''
                   }`}
                 />
-              </BubbleButton>
+              </button>
 
-              <BubbleButton
-                bubbleVariant="primary"
-                waterPhase={1}
+              <button
                 onClick={onPlayPause}
                 aria-label={isPlaying ? 'Pause' : 'Play'}
-                className="w-10 h-10 mx-0.5 rounded-full bg-white text-black flex items-center justify-center cursor-pointer"
+                className="w-10 h-10 mx-0.5 rounded-full bg-white text-black flex items-center justify-center shadow-md transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 {isPlaying ? (
                   <svg viewBox="0 0 16 16" className="w-4 h-4 fill-current" aria-hidden="true">
@@ -160,25 +156,23 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                     <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z" />
                   </svg>
                 )}
-              </BubbleButton>
+              </button>
 
-              <BubbleButton
-                waterPhase={2}
+              <button
                 onClick={onNext}
                 aria-label="Next track"
-                className="w-9 h-9 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <SkipForward className="w-4 h-4 fill-current stroke-none" />
-              </BubbleButton>
+              </button>
 
-              <BubbleButton
-                waterPhase={3}
+              <button
                 onClick={onOpenFullPlayer}
                 aria-label="Unfold medium player card"
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white/75 hover:text-white cursor-pointer"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-white/75 hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <ChevronUp className="w-4 h-4" />
-              </BubbleButton>
+              </button>
             </div>
           </div>
         ) : (
@@ -207,15 +201,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
         {/* Subtle Top Fold-Up Tab */}
         {currentTrack && (
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-            <BubbleButton
-              bubbleVariant="pill"
+            <button
               onClick={onOpenFullPlayer}
               aria-label="Unfold medium player card"
               title="Unfold player card"
-              className="px-3 py-0.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-lg text-white/75 hover:text-white flex items-center justify-center cursor-pointer shadow-md"
+              className="px-3 py-0.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 backdrop-blur-lg text-white/75 hover:text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-md"
             >
               <ChevronUp className="w-3.5 h-3.5" />
-            </BubbleButton>
+            </button>
           </div>
         )}
 
@@ -262,17 +255,17 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                 </span>
               </div>
 
-              <BubbleButton
+              <button
                 onClick={onToggleLike}
                 aria-label={isLiked ? 'Remove from Your Library' : 'Save to Your Library'}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer shrink-0"
               >
                 <Heart
                   className={`w-4 h-4 transition-colors ${
                     isLiked ? 'text-[#1ed760] fill-[#1ed760]' : ''
                   }`}
                 />
-              </BubbleButton>
+              </button>
             </>
           ) : (
             <div className="flex items-center gap-3">
@@ -290,11 +283,10 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           {/* Buttons Row */}
           <div className="flex items-center gap-3 lg:gap-5 mb-1">
             {/* Shuffle */}
-            <BubbleButton
-              waterPhase={1}
+            <button
               onClick={onToggleShuffle}
               aria-label="Enable shuffle"
-              className={`relative w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+              className={`relative w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                 isShuffle ? 'text-[#1ed760]' : 'text-[#b3b3b3] hover:text-white'
               }`}
             >
@@ -302,25 +294,22 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
               {isShuffle && (
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1ed760]" />
               )}
-            </BubbleButton>
+            </button>
 
             {/* Previous */}
-            <BubbleButton
-              waterPhase={2}
+            <button
               onClick={onPrevious}
               aria-label="Previous"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
             >
               <SkipBack className="w-4 h-4 fill-current stroke-none" />
-            </BubbleButton>
+            </button>
 
-            {/* Play / Pause Circular Main Water Bubble Button */}
-            <BubbleButton
-              bubbleVariant="primary"
-              waterPhase={3}
+            {/* Play / Pause */}
+            <button
               onClick={onPlayPause}
               aria-label={isPlaying ? 'Pause' : 'Play'}
-              className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white text-black flex items-center justify-center cursor-pointer"
+              className="w-9 h-9 lg:w-10 lg:h-10 rounded-full bg-white text-black flex items-center justify-center shadow-md transition-transform hover:scale-105 active:scale-95 cursor-pointer"
             >
               {isPlaying ? (
                 <svg viewBox="0 0 16 16" className="w-4 h-4 fill-current" aria-hidden="true">
@@ -331,24 +320,22 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
                   <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z" />
                 </svg>
               )}
-            </BubbleButton>
+            </button>
 
             {/* Next */}
-            <BubbleButton
-              waterPhase={4}
+            <button
               onClick={onNext}
               aria-label="Next"
-              className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
             >
               <SkipForward className="w-4 h-4 fill-current stroke-none" />
-            </BubbleButton>
+            </button>
 
             {/* Repeat */}
-            <BubbleButton
-              waterPhase={5}
+            <button
               onClick={onCycleRepeat}
               aria-label="Repeat mode"
-              className={`relative w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+              className={`relative w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                 repeatMode !== 'off' ? 'text-[#1ed760]' : 'text-[#b3b3b3] hover:text-white'
               }`}
             >
@@ -360,7 +347,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
               {repeatMode !== 'off' && (
                 <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1ed760]" />
               )}
-            </BubbleButton>
+            </button>
           </div>
 
           {/* Scrubber Bar */}
@@ -402,12 +389,11 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
         {/* Right: Auxiliary Controls */}
         <div className="flex items-center gap-2 w-1/4 justify-end min-w-[220px]">
           {/* Sound Enhancer Preset Cycle */}
-          <BubbleButton
-            bubbleVariant="pill"
+          <button
             onClick={onCycleSoundPreset}
             aria-label={`Sound Enhancer: ${getPresetConfig(soundPreset).label}`}
             title={`Sound Enhancer (${getPresetConfig(soundPreset).label}) — Click to switch`}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold cursor-pointer shrink-0 ${
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0 ${
               soundPreset !== 'flat'
                 ? 'bg-[#1ed760]/15 border-[#1ed760]/40 text-[#1ed760] hover:bg-[#1ed760]/25'
                 : 'bg-white/[0.06] border-white/10 text-[#b3b3b3] hover:text-white'
@@ -415,44 +401,41 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           >
             <AudioLines className="w-3.5 h-3.5 shrink-0" />
             <span>{getPresetConfig(soundPreset).shortLabel}</span>
-          </BubbleButton>
+          </button>
 
           {/* Now Playing View */}
-          <BubbleButton
-            waterPhase={1}
+          <button
             onClick={onToggleRightDrawer}
             aria-label="Now Playing View"
             title="Now playing view"
-            className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
               isRightDrawerOpen ? 'text-[#1ed760]' : 'text-[#b3b3b3] hover:text-white'
             }`}
           >
             <PictureInPicture2 className="w-4 h-4" />
-          </BubbleButton>
+          </button>
 
           {/* Lyrics */}
-          <BubbleButton
-            waterPhase={2}
+          <button
             onClick={onToggleLyrics}
             aria-label="Lyrics"
             title="Lyrics"
-            className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
               isLyricsOpen ? 'text-[#1ed760]' : 'text-[#b3b3b3] hover:text-white'
             }`}
           >
             <Mic2 className="w-4 h-4" />
-          </BubbleButton>
+          </button>
 
           {/* Queue */}
-          <BubbleButton
-            waterPhase={3}
+          <button
             onClick={onToggleRightDrawer}
             aria-label="Queue"
             title="Queue"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <ListMusic className="w-4 h-4" />
-          </BubbleButton>
+          </button>
 
           {/* Volume */}
           <div
@@ -460,10 +443,10 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
             onMouseEnter={() => setIsHoveringVolume(true)}
             onMouseLeave={() => setIsHoveringVolume(false)}
           >
-            <BubbleButton
+            <button
               onClick={handleToggleMute}
               aria-label={isMuted || volume === 0 ? 'Unmute' : 'Mute'}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer shrink-0"
+              className="w-7 h-7 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer shrink-0"
             >
               {isMuted || volume === 0 ? (
                 <VolumeX className="w-4 h-4" />
@@ -472,7 +455,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
               ) : (
                 <Volume2 className="w-4 h-4" />
               )}
-            </BubbleButton>
+            </button>
 
             <div className="relative flex-1 flex items-center h-4 cursor-pointer">
               <div className="w-full h-1 bg-[#4d4d4d] rounded-full overflow-hidden">
@@ -503,14 +486,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({
           </div>
 
           {/* Full Player Card Toggle */}
-          <BubbleButton
+          <button
             onClick={onOpenFullPlayer}
             aria-label="Open full player card"
             title="Open full player"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white cursor-pointer"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#b3b3b3] hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
           >
             <Maximize2 className="w-4 h-4" />
-          </BubbleButton>
+          </button>
         </div>
       </footer>
     </>

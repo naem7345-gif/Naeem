@@ -24,7 +24,6 @@ import {
   SOUND_PRESETS,
 } from '../services/audioEnhancer';
 import { CoverArt } from './CoverArt';
-import { BubbleButton } from './BubbleButton';
 
 interface FullPlayerCardProps {
   isOpen: boolean;
@@ -168,14 +167,14 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
                 {currentTrack.quality}
               </span>
             )}
-            <BubbleButton
+            <button
               onClick={onClose}
               aria-label="Fold player card"
               title="Fold down"
-              className="w-8 h-8 rounded-full text-white flex items-center justify-center cursor-pointer"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
               <ChevronDown className="w-4 h-4" />
-            </BubbleButton>
+            </button>
           </div>
         </div>
 
@@ -207,11 +206,10 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
                   {currentTrack.artist}
                 </p>
 
-                <BubbleButton
-                  bubbleVariant="pill"
+                <button
                   onClick={onToggleLike}
                   aria-label={isLiked ? 'Remove from Your Library' : 'Save to Your Library'}
-                  className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 text-xs font-semibold text-white cursor-pointer"
+                  className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 text-xs font-semibold text-white transition-all hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   <Heart
                     className={`w-3.5 h-3.5 transition-colors ${
@@ -219,7 +217,7 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
                     }`}
                   />
                   <span>{isLiked ? 'Liked' : 'Like'}</span>
-                </BubbleButton>
+                </button>
               </div>
             </div>
 
@@ -258,34 +256,30 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
               </div>
             </div>
 
-            {/* Transport Controls — 3D Water Bubble Buttons */}
+            {/* Transport Controls */}
             <div className="flex items-center justify-center gap-3.5">
-              <BubbleButton
-                waterPhase={0}
+              <button
                 onClick={onToggleShuffle}
                 aria-label="Toggle shuffle"
-                className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                   isShuffle ? 'text-[#1ed760]' : 'text-white/75 hover:text-white'
                 }`}
               >
                 <Shuffle className="w-4 h-4" />
-              </BubbleButton>
+              </button>
 
-              <BubbleButton
-                waterPhase={1}
+              <button
                 onClick={onPrevious}
                 aria-label="Previous track"
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white/85 hover:text-white cursor-pointer"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-white/85 hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <SkipBack className="w-5 h-5 fill-current stroke-none" />
-              </BubbleButton>
+              </button>
 
-              <BubbleButton
-                bubbleVariant="primary"
-                waterPhase={2}
+              <button
                 onClick={onPlayPause}
                 aria-label={isPlaying ? 'Pause' : 'Play'}
-                className="w-11 h-11 rounded-full bg-white text-black flex items-center justify-center cursor-pointer"
+                className="w-11 h-11 rounded-full bg-white text-black flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 {isPlaying ? (
                   <svg viewBox="0 0 16 16" className="w-4.5 h-4.5 fill-current" aria-hidden="true">
@@ -296,22 +290,20 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
                     <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z" />
                   </svg>
                 )}
-              </BubbleButton>
+              </button>
 
-              <BubbleButton
-                waterPhase={3}
+              <button
                 onClick={onNext}
                 aria-label="Next track"
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white/85 hover:text-white cursor-pointer"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-white/85 hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <SkipForward className="w-5 h-5 fill-current stroke-none" />
-              </BubbleButton>
+              </button>
 
-              <BubbleButton
-                waterPhase={4}
+              <button
                 onClick={onCycleRepeat}
                 aria-label="Cycle repeat"
-                className={`w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                   repeatMode !== 'off' ? 'text-[#1ed760]' : 'text-white/75 hover:text-white'
                 }`}
               >
@@ -320,16 +312,16 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
                 ) : (
                   <Repeat className="w-4 h-4" />
                 )}
-              </BubbleButton>
+              </button>
             </div>
 
             {/* Volume & Sound Preset Selector */}
             <div className="w-full space-y-2.5 flex flex-col items-center">
               <div className="w-full max-w-[230px] flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/10">
-                <BubbleButton
+                <button
                   onClick={() => onVolumeChange(volume === 0 ? 0.7 : 0)}
                   aria-label={volume === 0 ? 'Unmute' : 'Mute'}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-white/75 hover:text-white cursor-pointer shrink-0"
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-white/75 hover:text-white transition-transform hover:scale-105 active:scale-95 cursor-pointer shrink-0"
                 >
                   {volume === 0 ? (
                     <VolumeX className="w-4 h-4" />
@@ -338,7 +330,7 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
                   ) : (
                     <Volume2 className="w-4 h-4" />
                   )}
-                </BubbleButton>
+                </button>
                 <input
                   type="range"
                   min={0}
@@ -353,24 +345,22 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
 
               <div className="flex flex-wrap items-center justify-center gap-1.5">
                 <AudioLines className="w-3.5 h-3.5 text-[#1ed760] mr-0.5 shrink-0" />
-                {SOUND_PRESET_ORDER.map((id, idx) => {
+                {SOUND_PRESET_ORDER.map((id) => {
                   const cfg = SOUND_PRESETS[id];
                   const active = soundPreset === id;
                   return (
-                    <BubbleButton
-                      bubbleVariant="pill"
-                      waterPhase={idx}
+                    <button
                       key={id}
                       onClick={() => onSelectSoundPreset(id)}
                       title={cfg.description}
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border cursor-pointer ${
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                         active
                           ? 'bg-[#1ed760] text-black border-[#1ed760]'
                           : 'bg-white/[0.06] text-white/70 border-white/10 hover:bg-white/[0.12] hover:text-white'
                       }`}
                     >
                       {cfg.shortLabel}
-                    </BubbleButton>
+                    </button>
                   );
                 })}
               </div>
@@ -380,10 +370,9 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
           {/* Right Column: Compact Queue & Lyrics Panel */}
           <div className="md:col-span-6 flex flex-col rounded-2xl bg-white/[0.05] border border-white/10 backdrop-blur-xl overflow-hidden h-[200px] sm:h-[250px]">
             <div className="flex items-center gap-2 p-2.5 border-b border-white/10 bg-white/[0.03]">
-              <BubbleButton
-                bubbleVariant="pill"
+              <button
                 onClick={() => setActiveTab('queue')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                   activeTab === 'queue'
                     ? 'bg-white text-black shadow'
                     : 'bg-white/[0.06] text-white/75 hover:text-white hover:bg-white/10'
@@ -391,11 +380,10 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
               >
                 <ListMusic className="w-3.5 h-3.5" />
                 <span>Up Next</span>
-              </BubbleButton>
-              <BubbleButton
-                bubbleVariant="pill"
+              </button>
+              <button
                 onClick={() => setActiveTab('lyrics')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all hover:scale-105 active:scale-95 cursor-pointer ${
                   activeTab === 'lyrics'
                     ? 'bg-white text-black shadow'
                     : 'bg-white/[0.06] text-white/75 hover:text-white hover:bg-white/10'
@@ -403,7 +391,7 @@ export const FullPlayerCard: React.FC<FullPlayerCardProps> = ({
               >
                 <Mic2 className="w-3.5 h-3.5" />
                 <span>Lyrics</span>
-              </BubbleButton>
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-2.5 space-y-1 no-scrollbar">

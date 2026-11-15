@@ -216,12 +216,15 @@ export interface HomeCatalog {
   playlists: Playlist[];
 }
 
+export const SPOTIFY_API_BASE = '/api/spotify';
+
 const searchCache = new Map<string, SearchResponse>();
 const trackDetailCache = new Map<string, Track>();
 const relatedCache = new Map<string, Track[]>();
 const artistCache = new Map<string, Artist>();
 const albumCache = new Map<string, Album>();
 const playlistCache = new Map<string, Playlist>();
+let homeCatalogCache: HomeCatalog | null = null;
 let podcastCatalogCache: PodcastCatalog | null = null;
 
 async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<T> {
@@ -245,17 +248,16 @@ export async function searchMusic(
   const cached = searchCache.get(cacheKey);
   if (cached) return cached;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const json = await fetchJson<any>(
-    `${API_BASE_URL}/search?q=${encodeURIComponent(trimmed)}&limit=40`,
+  const json = await fetchJson<Partial<SearchResponse>>(
+    `${SPOTIFY_API_BASE}/search?q=${encodeURIComponent(trimmed)}&limit=24`,
     signal
   );
 
   const result: SearchResponse = {
-    tracks: dedupeById(Array.isArray(json?.data) ? json.data.map(normalizeTrack) : []),
-    artists: dedupeById(Array.isArray(json?.artists) ? json.artists.map(normalizeArtist) : []),
-    albums: dedupeById(Array.isArray(json?.albums) ? json.albums.map(normalizeAlbum) : []),
-    playlists: dedupeById(Array.isArray(json?.playlists) ? json.playlists.map(normalizePlaylist) : []),
+    tracks: dedupeById(Array.isArray(json?.tracks) ? json.tracks : []),
+    artists: dedupeById(Array.isArray(json?.artists) ? json.artists : []),
+    albums: dedupeById(Array.isArray(json?.albums) ? json.albums : []),
+    playlists: dedupeById(Array.isArray(json?.playlists) ? json.playlists : []),
   };
 
   searchCache.set(cacheKey, result);
@@ -268,12 +270,12 @@ export async function getTrackDetails(trackId: string): Promise<Track | null> {
   if (cached) return cached;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = await fetchJson<any>(`${API_BASE_URL}/track/${encodeURIComponent(trackId)}`);
+    const json = await fetchJson<{ data?: Track }>(
+      `${SPOTIFY_API_BASE}/track/${encodeURIComponent(trackId)}`
+    );
     if (!json?.data) return null;
-    const normalized = normalizeTrack(json.data);
-    trackDetailCache.set(trackId, normalized);
-    return normalized;
+    trackDetailCache.set(trackId, json.data);
+    return json.data;
   } catch {
     return null;
   }
@@ -285,9 +287,10 @@ export async function getRelatedTracks(trackId: string): Promise<Track[]> {
   if (cached) return cached;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = await fetchJson<any>(`${API_BASE_URL}/track/${encodeURIComponent(trackId)}/related`);
-    const tracks = Array.isArray(json?.data) ? json.data.map(normalizeTrack) : [];
+    const json = await fetchJson<{ data?: Track[] }>(
+      `${SPOTIFY_API_BASE}/track/${encodeURIComponent(trackId)}/related`
+    );
+    const tracks = Array.isArray(json?.data) ? json.data : [];
     relatedCache.set(trackId, tracks);
     return tracks;
   } catch {
@@ -301,12 +304,12 @@ export async function getArtistDetails(artistId: string): Promise<Artist | null>
   if (cached) return cached;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = await fetchJson<any>(`${API_BASE_URL}/artist/${encodeURIComponent(artistId)}`);
+    const json = await fetchJson<{ data?: Artist }>(
+      `${SPOTIFY_API_BASE}/artist/${encodeURIComponent(artistId)}`
+    );
     if (!json?.data) return null;
-    const normalized = normalizeArtist(json.data);
-    artistCache.set(artistId, normalized);
-    return normalized;
+    artistCache.set(artistId, json.data);
+    return json.data;
   } catch {
     return null;
   }
@@ -318,12 +321,12 @@ export async function getAlbumDetails(albumId: string): Promise<Album | null> {
   if (cached) return cached;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = await fetchJson<any>(`${API_BASE_URL}/album/${encodeURIComponent(albumId)}`);
+    const json = await fetchJson<{ data?: Album }>(
+      `${SPOTIFY_API_BASE}/album/${encodeURIComponent(albumId)}`
+    );
     if (!json?.data) return null;
-    const normalized = normalizeAlbum(json.data);
-    albumCache.set(albumId, normalized);
-    return normalized;
+    albumCache.set(albumId, json.data);
+    return json.data;
   } catch {
     return null;
   }
@@ -335,12 +338,12 @@ export async function getPlaylistDetails(playlistId: string): Promise<Playlist |
   if (cached) return cached;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const json = await fetchJson<any>(`${API_BASE_URL}/playlist/${encodeURIComponent(playlistId)}`);
+    const json = await fetchJson<{ data?: Playlist }>(
+      `${SPOTIFY_API_BASE}/playlist/${encodeURIComponent(playlistId)}`
+    );
     if (!json?.data) return null;
-    const normalized = normalizePlaylist(json.data);
-    playlistCache.set(playlistId, normalized);
-    return normalized;
+    playlistCache.set(playlistId, json.data);
+    return json.data;
   } catch {
     return null;
   }
@@ -405,7 +408,7 @@ export function selectPrimaryArtist(artists: Artist[], query: string): Artist | 
       let score = 0;
       if (nameLower === normalizedQuery) score += 1000;
       else if (nameLower.includes(normalizedQuery)) score += 400;
-      if (artist.avatarUrl.includes('saavncdn.com')) score += 150;
+      if (artist.avatarUrl.includes('scdn.co') || artist.avatarUrl.includes('saavncdn.com')) score += 150;
       if (artist.followersCount) {
         score += Math.min(Math.log10(Math.max(artist.followersCount, 1)) * 20, 200);
       }
@@ -422,9 +425,9 @@ export function selectPrimaryPlaylist(playlists: Playlist[]): Playlist | undefin
     .filter((pl) => isValidArtworkUrl(pl.coverUrl))
     .map((pl) => {
       let score = 0;
-      if (pl.owner.toLowerCase().includes('editorial')) score += 500;
+      if (pl.owner.toLowerCase().includes('editorial') || pl.owner.toLowerCase() === 'spotify') score += 500;
       if (pl.title.toLowerCase().startsWith('this is ')) score += 300;
-      if (pl.coverUrl.includes('saavncdn.com')) score += 200;
+      if (pl.coverUrl.includes('scdn.co') || pl.coverUrl.includes('saavncdn.com')) score += 200;
       if (pl.owner.toLowerCase().includes('radio')) score -= 250;
       return { pl, score };
     })
@@ -441,83 +444,22 @@ export const VIBE_SEED_QUERIES = [
 ];
 
 export async function getHomeCatalog(): Promise<HomeCatalog> {
-  const seedQueries = HOME_SEED_QUERIES;
-  const [settled, vibeSettled] = await Promise.all([
-    Promise.allSettled(seedQueries.map((q) => searchMusic(q))),
-    Promise.allSettled(VIBE_SEED_QUERIES.map((q) => searchMusic(q))),
-  ]);
+  if (homeCatalogCache) return homeCatalogCache;
 
-  const trackBuckets: Track[][] = [];
-  const albumBuckets: Album[][] = [];
-  const primaryArtists: Artist[] = [];
-  const secondaryArtists: Artist[] = [];
-  const primaryPlaylists: Playlist[] = [];
-  const secondaryPlaylists: Playlist[] = [];
-
-  settled.forEach((res, idx) => {
-    if (res.status !== 'fulfilled') return;
-    const query = seedQueries[idx];
-    const { tracks, artists, albums, playlists } = res.value;
-
-    if (tracks.length > 0) {
-      trackBuckets.push(tracks.slice(0, 4));
-    }
-    if (albums.length > 0) {
-      albumBuckets.push(albums.slice(0, 3));
-    }
-
-    const bestArtist = selectPrimaryArtist(artists, query);
-    if (bestArtist) {
-      primaryArtists.push(bestArtist);
-    }
-    for (const artist of artists) {
-      if (
-        artist.id !== bestArtist?.id &&
-        isValidArtworkUrl(artist.avatarUrl) &&
-        !TRIBUTE_NAME_PATTERN.test(artist.name) &&
-        (artist.followersCount ?? 0) >= 1_000_000
-      ) {
-        secondaryArtists.push(artist);
-      }
-    }
-
-    const bestPlaylist = selectPrimaryPlaylist(playlists);
-    if (bestPlaylist) {
-      primaryPlaylists.push(bestPlaylist);
-    }
-    for (const pl of playlists) {
-      if (
-        pl.id !== bestPlaylist?.id &&
-        isValidArtworkUrl(pl.coverUrl) &&
-        !pl.owner.toLowerCase().includes('radio')
-      ) {
-        secondaryPlaylists.push(pl);
-      }
-    }
-  });
-
-  const trendingTracks = dedupeById(interleaveArrays(trackBuckets)).slice(0, 12);
-  const trendingIds = new Set(trendingTracks.map((t) => t.id));
-
-  const vibeBuckets: Track[][] = [];
-  vibeSettled.forEach((res) => {
-    if (res.status !== 'fulfilled') return;
-    const freshOnly = res.value.tracks.filter((t) => !trendingIds.has(t.id));
-    if (freshOnly.length > 0) {
-      vibeBuckets.push(freshOnly.slice(0, 4));
-    }
-    if (res.value.albums.length > 0) {
-      albumBuckets.push(res.value.albums.slice(0, 2));
-    }
-  });
-
-  return {
-    tracks: trendingTracks,
-    freshTracks: dedupeById(interleaveArrays(vibeBuckets)).slice(0, 12),
-    artists: dedupeById([...primaryArtists, ...secondaryArtists]).slice(0, 12),
-    albums: dedupeById(interleaveArrays(albumBuckets)).slice(0, 12),
-    playlists: dedupeById([...primaryPlaylists, ...secondaryPlaylists]).slice(0, 12),
+  const json = await fetchJson<Partial<HomeCatalog>>(`${SPOTIFY_API_BASE}/home`);
+  const catalog: HomeCatalog = {
+    tracks: Array.isArray(json?.tracks) ? json.tracks : [],
+    freshTracks: Array.isArray(json?.freshTracks) ? json.freshTracks : [],
+    artists: Array.isArray(json?.artists) ? json.artists : [],
+    albums: Array.isArray(json?.albums) ? json.albums : [],
+    playlists: Array.isArray(json?.playlists) ? json.playlists : [],
   };
+
+  if (catalog.tracks.length > 0 || catalog.artists.length > 0) {
+    homeCatalogCache = catalog;
+  }
+
+  return catalog;
 }
 
 export const PODCAST_SEED_QUERIES = [
@@ -554,7 +496,6 @@ export function scorePodcastEpisode(track: Track): number {
   else if (track.duration >= 180) score += 80;
   if (isValidArtworkUrl(track.coverUrl)) score += 100;
 
-  // Demote generic short rap/pop tracks titled simply "Podcast"
   if (titleLower === 'podcast' && track.duration < 240) {
     score -= 400;
   }
@@ -572,7 +513,7 @@ export function isPodcastShowArtist(artist: Artist): boolean {
   return (
     PODCAST_KEYWORDS.test(artist.name) ||
     PODCAST_KEYWORDS.test(artist.bio) ||
-    /\b(huberman|sadhguru|rogan|garage|rohn|peterson|shailendra|apurva)\b/i.test(artist.name)
+    /\b(huberman|sadhguru|rogan|garage|rohn|peterson|shailendra|apurva|raj shamani)\b/i.test(artist.name)
   );
 }
 
@@ -586,48 +527,11 @@ export function isPodcastPlaylist(playlist: Playlist): boolean {
 export async function getPodcastCatalog(): Promise<PodcastCatalog> {
   if (podcastCatalogCache) return podcastCatalogCache;
 
-  const settled = await Promise.allSettled(
-    PODCAST_SEED_QUERIES.map((q) => searchMusic(q))
-  );
-
-  const episodeBuckets: Track[][] = [];
-  const shows: Artist[] = [];
-  const podcastPlaylists: Playlist[] = [];
-
-  settled.forEach((res) => {
-    if (res.status !== 'fulfilled') return;
-    const { tracks, artists, playlists } = res.value;
-
-    const rankedEpisodes = tracks
-      .map((t) => ({ track: t, score: scorePodcastEpisode(t) }))
-      .filter((entry) => entry.score >= 250)
-      .sort((a, b) => b.score - a.score)
-      .map((entry) => entry.track);
-
-    if (rankedEpisodes.length > 0) {
-      episodeBuckets.push(rankedEpisodes.slice(0, 4));
-    }
-
-    for (const artist of artists) {
-      if (isPodcastShowArtist(artist)) {
-        shows.push(artist);
-      }
-    }
-
-    for (const pl of playlists) {
-      if (isPodcastPlaylist(pl)) {
-        podcastPlaylists.push({
-          ...pl,
-          isPodcast: true,
-        });
-      }
-    }
-  });
-
+  const json = await fetchJson<Partial<PodcastCatalog>>(`${SPOTIFY_API_BASE}/podcasts`);
   const catalog: PodcastCatalog = {
-    episodes: dedupeById(interleaveArrays(episodeBuckets)).slice(0, 18),
-    shows: dedupeById(shows).slice(0, 12),
-    playlists: dedupeById(podcastPlaylists).slice(0, 12),
+    episodes: Array.isArray(json?.episodes) ? json.episodes : [],
+    shows: Array.isArray(json?.shows) ? json.shows : [],
+    playlists: Array.isArray(json?.playlists) ? json.playlists : [],
   };
 
   if (catalog.episodes.length > 0 || catalog.shows.length > 0 || catalog.playlists.length > 0) {
