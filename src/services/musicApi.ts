@@ -210,6 +210,7 @@ export interface SearchResponse {
 
 export interface HomeCatalog {
   tracks: Track[];
+  freshTracks: Track[];
   artists: Artist[];
   albums: Album[];
   playlists: Playlist[];
@@ -432,9 +433,19 @@ export function selectPrimaryPlaylist(playlists: Playlist[]): Playlist | undefin
   return scored[0]?.pl ?? playlists[0];
 }
 
+export const VIBE_SEED_QUERIES = [
+  'Bollywood Hits',
+  'Punjabi Hits',
+  '90s Hindi Hits',
+  'Hindi Lofi',
+];
+
 export async function getHomeCatalog(): Promise<HomeCatalog> {
   const seedQueries = HOME_SEED_QUERIES;
-  const settled = await Promise.allSettled(seedQueries.map((q) => searchMusic(q)));
+  const [settled, vibeSettled] = await Promise.all([
+    Promise.allSettled(seedQueries.map((q) => searchMusic(q))),
+    Promise.allSettled(VIBE_SEED_QUERIES.map((q) => searchMusic(q))),
+  ]);
 
   const trackBuckets: Track[][] = [];
   const albumBuckets: Album[][] = [];
@@ -485,8 +496,24 @@ export async function getHomeCatalog(): Promise<HomeCatalog> {
     }
   });
 
+  const trendingTracks = dedupeById(interleaveArrays(trackBuckets)).slice(0, 12);
+  const trendingIds = new Set(trendingTracks.map((t) => t.id));
+
+  const vibeBuckets: Track[][] = [];
+  vibeSettled.forEach((res) => {
+    if (res.status !== 'fulfilled') return;
+    const freshOnly = res.value.tracks.filter((t) => !trendingIds.has(t.id));
+    if (freshOnly.length > 0) {
+      vibeBuckets.push(freshOnly.slice(0, 4));
+    }
+    if (res.value.albums.length > 0) {
+      albumBuckets.push(res.value.albums.slice(0, 2));
+    }
+  });
+
   return {
-    tracks: dedupeById(interleaveArrays(trackBuckets)).slice(0, 12),
+    tracks: trendingTracks,
+    freshTracks: dedupeById(interleaveArrays(vibeBuckets)).slice(0, 12),
     artists: dedupeById([...primaryArtists, ...secondaryArtists]).slice(0, 12),
     albums: dedupeById(interleaveArrays(albumBuckets)).slice(0, 12),
     playlists: dedupeById([...primaryPlaylists, ...secondaryPlaylists]).slice(0, 12),

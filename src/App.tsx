@@ -46,6 +46,7 @@ export default function App() {
 
   // Live API Catalog State
   const [catalogTracks, setCatalogTracks] = useState<Track[]>([]);
+  const [freshTracks, setFreshTracks] = useState<Track[]>([]);
   const [catalogArtists, setCatalogArtists] = useState<Artist[]>([]);
   const [catalogAlbums, setCatalogAlbums] = useState<Album[]>([]);
   const [apiPlaylists, setApiPlaylists] = useState<Playlist[]>([]);
@@ -94,6 +95,7 @@ export default function App() {
     try {
       const data = await getHomeCatalog();
       setCatalogTracks(data.tracks);
+      setFreshTracks(data.freshTracks || []);
       setCatalogArtists(data.artists);
       setCatalogAlbums(data.albums);
       setApiPlaylists(data.playlists);
@@ -148,7 +150,13 @@ export default function App() {
   // Build Liked Songs playlist dynamically
   const likedPlaylist: Playlist = useMemo(() => {
     const tracks = Array.from(likedTrackIds)
-      .map((id) => likedTrackMap[id] || catalogTracks.find((t) => t.id === id))
+      .map(
+        (id) =>
+          likedTrackMap[id] ||
+          catalogTracks.find((t) => t.id === id) ||
+          freshTracks.find((t) => t.id === id) ||
+          podcastEpisodes.find((t) => t.id === id)
+      )
       .filter((t): t is Track => Boolean(t));
 
     return {
@@ -163,7 +171,7 @@ export default function App() {
       isPinned: true,
       gradient: 'from-[#450af5] to-[#8e8ee5]',
     };
-  }, [likedTrackIds, likedTrackMap, catalogTracks]);
+  }, [likedTrackIds, likedTrackMap, catalogTracks, freshTracks, podcastEpisodes]);
 
   const allPlaylists = useMemo(
     () => [likedPlaylist, ...customPlaylists, ...apiPlaylists, ...podcastPlaylists],
@@ -479,6 +487,8 @@ export default function App() {
     const trackObj =
       currentTrackList.find((t) => t.id === trackId) ||
       catalogTracks.find((t) => t.id === trackId) ||
+      freshTracks.find((t) => t.id === trackId) ||
+      podcastEpisodes.find((t) => t.id === trackId) ||
       currentTrack;
 
     setLikedTrackIds((prev) => {
@@ -578,6 +588,7 @@ export default function App() {
           {viewState.type === 'home' && (
             <HomeFeed
               tracks={catalogTracks}
+              freshTracks={freshTracks}
               artists={catalogArtists}
               albums={catalogAlbums}
               playlists={apiPlaylists}

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   API_BASE_URL,
   HOME_SEED_QUERIES,
+  VIBE_SEED_QUERIES,
   PODCAST_SEED_QUERIES,
   buildTrackThumbnailUrl,
   buildTrackStreamUrl,
@@ -180,11 +181,15 @@ test('selectPrimaryArtist filters out tribute/impostor artists and generic avata
   assert.equal(picked?.id, 'art-real');
 });
 
-test('HOME_SEED_QUERIES prominently includes Indian creators', () => {
+test('HOME_SEED_QUERIES and VIBE_SEED_QUERIES prominently include Indian creators and vibes', () => {
   assert.ok(HOME_SEED_QUERIES.includes('Arijit Singh'));
   assert.ok(HOME_SEED_QUERIES.includes('Diljit Dosanjh'));
   assert.ok(HOME_SEED_QUERIES.includes('Shreya Ghoshal'));
   assert.ok(HOME_SEED_QUERIES.includes('A.R. Rahman'));
+  assert.ok(VIBE_SEED_QUERIES.includes('Bollywood Hits'));
+  assert.ok(VIBE_SEED_QUERIES.includes('Punjabi Hits'));
+  assert.ok(VIBE_SEED_QUERIES.includes('90s Hindi Hits'));
+  assert.ok(VIBE_SEED_QUERIES.includes('Hindi Lofi'));
 });
 
 test('selectPrimaryPlaylist prefers editorial playlists over radio playlists', () => {
