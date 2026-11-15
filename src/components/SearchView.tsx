@@ -13,6 +13,7 @@ import {
 } from '../services/musicApi';
 import { CoverArt } from './CoverArt';
 import { formatTime } from '../utils/audioUtils';
+import { handleSpotlightMove } from '../utils/hoverSpotlight';
 
 interface SearchViewProps {
   viewState: ViewState;
@@ -120,14 +121,15 @@ export const SearchView: React.FC<SearchViewProps> = ({
   const fullSongList = results.tracks;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl p-6 space-y-8 no-scrollbar shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden bg-white/[0.04] backdrop-blur-lg border border-white/10 rounded-2xl md:rounded-3xl p-4 sm:p-6 space-y-6 sm:space-y-8 no-scrollbar shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
       {!query ? (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-white tracking-tight">Browse all</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+        <div className="space-y-5 sm:space-y-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Browse all</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-6">
             {CATEGORIES.map((category) => (
               <div
                 key={category.id}
+                onMouseMove={handleSpotlightMove}
                 onClick={() =>
                   setViewState({
                     type: 'search',
@@ -135,16 +137,16 @@ export const SearchView: React.FC<SearchViewProps> = ({
                   })
                 }
                 style={{ backgroundColor: category.color }}
-                className="relative aspect-square rounded-2xl p-4 overflow-hidden shadow-lg border border-white/15 hover:scale-102 transition-transform cursor-pointer select-none group"
+                className="relative hover-spotlight card-hover-lift aspect-square rounded-2xl p-4 overflow-hidden shadow-lg border border-white/15 hover:border-white/35 cursor-pointer select-none group"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/20 pointer-events-none" />
-                <h3 className="relative z-10 font-bold text-xl sm:text-2xl text-white tracking-tight break-words max-w-[80%]">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-black/25 pointer-events-none" />
+                <h3 className="relative z-10 font-bold text-xl sm:text-2xl text-white tracking-tight break-words max-w-[80%] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0.5">
                   {category.title}
                 </h3>
                 <CoverArt
                   src={category.coverUrl}
                   alt={category.title}
-                  className="absolute -right-3 -bottom-2 w-20 h-20 sm:w-24 sm:h-24 object-cover rotate-[25deg] shadow-2xl rounded-xl ring-1 ring-white/20 group-hover:scale-105 transition-transform"
+                  className="absolute -right-3 -bottom-2 w-20 h-20 sm:w-24 sm:h-24 object-cover rotate-[25deg] shadow-2xl rounded-xl ring-1 ring-white/20 group-hover:rotate-[16deg] group-hover:scale-110 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 />
               </div>
             ))}
@@ -369,24 +371,25 @@ export const SearchView: React.FC<SearchViewProps> = ({
                 <div className="lg:col-span-5 space-y-3">
                   <h2 className="text-2xl font-bold text-white tracking-tight">Top result</h2>
                   <div
+                    onMouseMove={handleSpotlightMove}
                     onClick={() => onPlayTrack(topResult, results.tracks)}
-                    className="group relative bg-white/[0.06] hover:bg-white/[0.12] backdrop-blur-xl border border-white/10 hover:border-white/20 p-5 rounded-2xl transition-all duration-200 cursor-pointer flex flex-col justify-between h-60 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
+                    className="group hover-spotlight card-hover-lift relative bg-white/[0.06] hover:bg-white/[0.13] border border-white/10 hover:border-white/25 p-5 rounded-2xl cursor-pointer flex flex-col justify-between h-60 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
                   >
                     <div className="relative w-24 h-24 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg">
                       <CoverArt
                         src={topResult.coverUrl}
                         fallbackSrc={topResult.fallbackCoverUrl}
                         alt={topResult.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.08]"
                       />
                     </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-white truncate">
+                    <div className="min-w-0">
+                      <h3 className="text-xl sm:text-2xl font-bold text-white truncate">
                         {topResult.title}
                       </h3>
-                      <div className="flex items-center gap-2 text-xs text-[#a7a7a7] mt-1">
-                        <span>Song •</span>
-                        <span className="text-white hover:underline truncate">
+                      <div className="flex items-center gap-2 text-xs text-[#a7a7a7] mt-1 min-w-0">
+                        <span className="shrink-0 whitespace-nowrap">Song •</span>
+                        <span className="text-white hover:underline truncate min-w-0">
                           {topResult.artist}
                         </span>
                       </div>
@@ -398,10 +401,10 @@ export const SearchView: React.FC<SearchViewProps> = ({
                         onPlayTrack(topResult, results.tracks);
                       }}
                       aria-label={`Play ${topResult.title}`}
-                      className={`absolute right-5 bottom-5 w-12 h-12 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                      className={`absolute right-5 bottom-5 w-12 h-12 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                         isPlaying && currentTrack?.id === topResult.id
                           ? 'opacity-100 scale-100'
-                          : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                          : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                       }`}
                     >
                       {isPlaying && currentTrack?.id === topResult.id ? (
@@ -434,8 +437,9 @@ export const SearchView: React.FC<SearchViewProps> = ({
                     return (
                       <div
                         key={`quick-${track.id}`}
+                        onMouseMove={handleSpotlightMove}
                         onClick={() => onPlayTrack(track, results.tracks)}
-                        className="group flex items-center justify-between p-2 rounded-xl hover:bg-white/[0.08] border border-transparent hover:border-white/10 transition-all cursor-pointer"
+                        className="group hover-spotlight flex items-center justify-between p-2 rounded-xl hover:bg-white/[0.09] border border-transparent hover:border-white/15 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:translate-x-1 cursor-pointer"
                       >
                         <div className="flex items-center gap-3 min-w-0 pr-4">
                           <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden ring-1 ring-white/15 shadow">
@@ -494,7 +498,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
               </div>
 
               <div className="bg-white/[0.03] border border-white/10 rounded-2xl overflow-hidden">
-                <div className="grid grid-cols-[28px_1fr_70px] md:grid-cols-[32px_4fr_3fr_80px] gap-4 px-4 py-2.5 border-b border-white/10 text-xs font-medium text-[#a7a7a7] uppercase tracking-wider">
+                <div className="grid grid-cols-[24px_1fr_52px] md:grid-cols-[32px_4fr_3fr_80px] gap-3 sm:gap-4 px-3 sm:px-4 py-2.5 border-b border-white/10 text-xs font-medium text-[#a7a7a7] uppercase tracking-wider">
                   <span className="text-center">#</span>
                   <span>Title</span>
                   <span className="hidden md:inline">Album</span>
@@ -512,7 +516,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                       <div
                         key={track.id}
                         onClick={() => onPlayTrack(track, fullSongList)}
-                        className={`group grid grid-cols-[28px_1fr_70px] md:grid-cols-[32px_4fr_3fr_80px] gap-4 px-4 py-2.5 items-center hover:bg-white/[0.08] transition-colors cursor-pointer ${
+                        className={`group grid grid-cols-[24px_1fr_52px] md:grid-cols-[32px_4fr_3fr_80px] gap-3 sm:gap-4 px-3 sm:px-4 py-2.5 items-center hover:bg-white/[0.08] transition-colors cursor-pointer ${
                           isTrackCurrent ? 'bg-white/[0.1]' : ''
                         }`}
                       >
@@ -588,16 +592,17 @@ export const SearchView: React.FC<SearchViewProps> = ({
                 {results.artists.map((artist) => (
                   <div
                     key={artist.id}
+                    onMouseMove={handleSpotlightMove}
                     onClick={() => setViewState({ type: 'artist', id: artist.id })}
-                    className="group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border border-white/[0.08] hover:border-white/20 p-3.5 rounded-2xl transition-all cursor-pointer flex flex-col"
+                    className="group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/25 p-3.5 rounded-2xl cursor-pointer flex flex-col"
                   >
                     <div className="relative aspect-square w-full mb-3">
-                      <div className="w-full h-full rounded-full overflow-hidden ring-1 ring-white/15 shadow-lg">
+                      <div className="w-full h-full rounded-full overflow-hidden ring-1 ring-white/15 group-hover:ring-[#1ed760]/50 shadow-lg transition-all duration-300">
                         <CoverArt
                           src={artist.avatarUrl}
                           fallbackSrc={artist.fallbackAvatarUrl}
                           alt={artist.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.08]"
                         />
                       </div>
                       <button
@@ -606,7 +611,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                           onPlayArtist(artist);
                         }}
                         aria-label={`Play ${artist.name}`}
-                        className="absolute right-1 bottom-1 w-10 h-10 rounded-full bg-[#1ed760] text-black shadow-xl flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all cursor-pointer"
+                        className="absolute right-1 bottom-1 w-10 h-10 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-xl flex items-center justify-center opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer"
                       >
                         <Play className="w-4 h-4 fill-current stroke-none translate-x-[0.5px]" />
                       </button>
@@ -629,15 +634,16 @@ export const SearchView: React.FC<SearchViewProps> = ({
                 {results.albums.map((album) => (
                   <div
                     key={album.id}
+                    onMouseMove={handleSpotlightMove}
                     onClick={() => setViewState({ type: 'album', id: album.id })}
-                    className="group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border border-white/[0.08] hover:border-white/20 p-3.5 rounded-2xl transition-all cursor-pointer flex flex-col"
+                    className="group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/25 p-3.5 rounded-2xl cursor-pointer flex flex-col"
                   >
                     <div className="relative aspect-square w-full mb-3 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg">
                       <CoverArt
                         src={album.coverUrl}
                         fallbackSrc={album.fallbackCoverUrl}
                         alt={album.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                       />
                       <button
                         onClick={(e) => {
@@ -645,7 +651,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                           onPlayAlbum(album);
                         }}
                         aria-label={`Play ${album.title}`}
-                        className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[#1ed760] text-black shadow-xl flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all cursor-pointer"
+                        className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-xl flex items-center justify-center opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer"
                       >
                         <Play className="w-4 h-4 fill-current stroke-none translate-x-[0.5px]" />
                       </button>
@@ -668,15 +674,16 @@ export const SearchView: React.FC<SearchViewProps> = ({
                 {results.playlists.map((playlist) => (
                   <div
                     key={playlist.id}
+                    onMouseMove={handleSpotlightMove}
                     onClick={() => setViewState({ type: 'playlist', id: playlist.id })}
-                    className="group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border border-white/[0.08] hover:border-white/20 p-3.5 rounded-2xl transition-all cursor-pointer flex flex-col"
+                    className="group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/25 p-3.5 rounded-2xl cursor-pointer flex flex-col"
                   >
                     <div className="relative aspect-square w-full mb-3 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg">
                       <CoverArt
                         src={playlist.coverUrl}
                         fallbackSrc={playlist.fallbackCoverUrl}
                         alt={playlist.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                       />
                       <button
                         onClick={(e) => {
@@ -684,7 +691,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
                           onPlayPlaylist(playlist);
                         }}
                         aria-label={`Play ${playlist.title}`}
-                        className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[#1ed760] text-black shadow-xl flex items-center justify-center opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all cursor-pointer"
+                        className="absolute right-2 bottom-2 w-10 h-10 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-xl flex items-center justify-center opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0 hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer"
                       >
                         <Play className="w-4 h-4 fill-current stroke-none translate-x-[0.5px]" />
                       </button>

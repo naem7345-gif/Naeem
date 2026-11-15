@@ -27,20 +27,20 @@ export const LyricsModal: React.FC<LyricsModalProps> = ({
   const activeLineIndex = findActiveLyricIndex(currentTrack, currentTime);
 
   return (
-    <div className="absolute inset-0 bg-[#14261d]/95 backdrop-blur-xl z-50 flex flex-col p-8 overflow-y-auto select-none transition-all">
+    <div className="animate-modal-pop fixed inset-0 md:absolute bg-[#111e18]/96 backdrop-blur-2xl z-[70] md:z-40 flex flex-col p-4 sm:p-8 pb-12 overflow-y-auto select-none transition-all">
       {/* Top Header */}
-      <div className="flex items-center justify-between max-w-4xl w-full mx-auto pb-6 border-b border-white/10 shrink-0">
-        <div className="flex items-center gap-3">
-          <Mic2 className="w-6 h-6 text-[#1ed760]" />
-          <div>
-            <h2 className="text-xl font-bold text-white">{currentTrack.title}</h2>
-            <p className="text-sm text-white/60">{currentTrack.artist}</p>
+      <div className="flex items-center justify-between max-w-4xl w-full mx-auto pb-4 sm:pb-6 border-b border-white/10 shrink-0 gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <Mic2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#1ed760] shrink-0" />
+          <div className="min-w-0">
+            <h2 className="text-lg sm:text-xl font-bold text-white truncate">{currentTrack.title}</h2>
+            <p className="text-xs sm:text-sm text-white/60 truncate">{currentTrack.artist}</p>
           </div>
         </div>
         <button
           onClick={onClose}
           aria-label="Close lyrics"
-          className="p-2 hover:bg-white/10 rounded-full text-white/70 hover:text-white transition-colors cursor-pointer"
+          className="p-2 hover:bg-white/10 rounded-full text-white/70 hover:text-white transition-colors cursor-pointer shrink-0"
         >
           <X className="w-6 h-6" />
         </button>

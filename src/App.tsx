@@ -80,6 +80,7 @@ export default function App() {
   const [isRightDrawerOpen, setIsRightDrawerOpen] = useState<boolean>(false);
   const [isLyricsOpen, setIsLyricsOpen] = useState<boolean>(false);
   const [isFullPlayerOpen, setIsFullPlayerOpen] = useState<boolean>(false);
+  const [isMobileLibraryOpen, setIsMobileLibraryOpen] = useState<boolean>(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [soundPreset, setSoundPreset] = useState<SoundPresetId>('studio');
 
@@ -552,12 +553,12 @@ export default function App() {
   const nextTrack = currentTrackList[nextTrackIndex] || null;
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#05070a] text-white font-sans relative">
-      {/* Subtle Ambient Glows for Glassmorphism Refraction */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
-        <div className="absolute -top-32 -left-24 w-[460px] h-[460px] rounded-full bg-[#1ed760]/12 blur-[140px]" />
-        <div className="absolute top-1/3 right-[-120px] w-[520px] h-[520px] rounded-full bg-[#450af5]/16 blur-[150px]" />
-        <div className="absolute -bottom-36 left-1/3 w-[480px] h-[480px] rounded-full bg-[#0d4f8b]/14 blur-[140px]" />
+    <div className="flex flex-col h-[100dvh] w-screen overflow-hidden bg-[#05070a] text-white font-sans relative isolate">
+      {/* Subtle Ambient Glows for Glassmorphism Refraction (zero-blur radial gradients for 60fps+) */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden -z-10">
+        <div className="absolute -top-44 -left-36 w-[580px] h-[580px] rounded-full bg-[radial-gradient(circle,rgba(30,215,96,0.14)_0%,rgba(30,215,96,0.04)_42%,transparent_72%)]" />
+        <div className="absolute top-1/4 -right-36 w-[640px] h-[640px] rounded-full bg-[radial-gradient(circle,rgba(69,10,245,0.18)_0%,rgba(69,10,245,0.05)_44%,transparent_72%)]" />
+        <div className="absolute -bottom-48 left-1/3 w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgba(13,79,139,0.16)_0%,rgba(13,79,139,0.04)_44%,transparent_72%)]" />
       </div>
 
       {/* Top Header */}
@@ -569,8 +570,8 @@ export default function App() {
       />
 
       {/* Main Workspace */}
-      <div className="flex-1 flex gap-2.5 px-2.5 pb-2.5 overflow-hidden relative z-10">
-        {/* Left Sidebar */}
+      <div className="flex-1 flex flex-col md:flex-row gap-2 md:gap-2.5 px-2 pb-1.5 md:px-2.5 md:pb-2.5 overflow-hidden relative min-h-0">
+        {/* Left Sidebar on Desktop (Hover-shutter), Horizontal Thumb-Zone Dock + Upward Shutter Sheet on Mobile */}
         <Sidebar
           playlists={allPlaylists}
           artists={allArtists}
@@ -581,10 +582,13 @@ export default function App() {
           setViewState={setViewState}
           onCreatePlaylist={() => setIsCreateModalOpen(true)}
           isLoggedIn={isLoggedIn}
+          isMobileOpen={isMobileLibraryOpen}
+          onOpenMobile={() => setIsMobileLibraryOpen(true)}
+          onCloseMobile={() => setIsMobileLibraryOpen(false)}
         />
 
         {/* Center Content View Area */}
-        <main className="flex-1 flex flex-col min-w-0 h-full relative overflow-hidden rounded-3xl">
+        <main className="order-1 md:order-2 flex-1 flex flex-col min-w-0 min-h-0 h-full relative overflow-hidden rounded-2xl md:rounded-3xl">
           {viewState.type === 'home' && (
             <HomeFeed
               tracks={catalogTracks}

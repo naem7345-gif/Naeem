@@ -21,6 +21,7 @@ import {
 import { Track, Artist, Album, Playlist, ViewState } from '../types/spotify';
 import { CoverArt } from './CoverArt';
 import { formatTime } from '../utils/audioUtils';
+import { handleSpotlightMove } from '../utils/hoverSpotlight';
 
 interface HomeFeedProps {
   tracks: Track[];
@@ -261,29 +262,29 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
   ].slice(0, 6);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl relative no-scrollbar shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-      {/* Dynamic Ambient Top Gradient & Floating Glow Orbs */}
+    <div className="flex-1 overflow-y-auto overflow-x-hidden bg-white/[0.04] backdrop-blur-lg border border-white/10 rounded-2xl md:rounded-3xl relative no-scrollbar shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+      {/* Dynamic Ambient Top Gradient & Floating Glow Orbs (zero-blur radial gradients) */}
       <div className="absolute top-0 left-0 right-0 h-96 bg-gradient-to-b from-[#1e3a2f]/45 via-[#121824]/30 to-transparent pointer-events-none -z-0 overflow-hidden">
-        <div className="absolute -top-20 left-10 w-72 h-72 rounded-full bg-[#1ed760]/12 blur-[100px] animate-ambient-drift" />
-        <div className="absolute -top-10 right-16 w-80 h-80 rounded-full bg-[#450af5]/15 blur-[110px] animate-ambient-drift" />
+        <div className="absolute -top-28 left-4 w-96 h-96 rounded-full bg-[radial-gradient(circle,rgba(30,215,96,0.14)_0%,transparent_68%)] animate-ambient-drift" />
+        <div className="absolute -top-20 right-8 w-[420px] h-[420px] rounded-full bg-[radial-gradient(circle,rgba(69,10,245,0.18)_0%,transparent_70%)] animate-ambient-drift" />
       </div>
 
-      <div className="relative z-10 p-6 space-y-8">
+      <div className="relative z-10 p-3 sm:p-6 space-y-5 sm:space-y-8">
         {/* Top Greeting & Filter Pills */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-1 animate-fade-up">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 pt-0.5 sm:pt-1 animate-fade-up">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white">
               {greeting}
             </h1>
-            <p className="text-xs sm:text-sm text-[#a7a7a7] mt-0.5">
+            <p className="text-[11px] sm:text-sm text-[#a7a7a7] mt-0.5 truncate">
               Indian &amp; Global Hits, Live Podcasts &amp; Studio Audio
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
             <button
               onClick={() => handleSelectFilter('all')}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer border ${
+              className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer border shrink-0 ${
                 activeFilter === 'all'
                   ? 'bg-white text-black border-white shadow-[0_4px_16px_rgba(255,255,255,0.2)]'
                   : 'bg-white/[0.08] border-white/10 text-white hover:bg-white/[0.15]'
@@ -293,7 +294,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
             </button>
             <button
               onClick={() => handleSelectFilter('music')}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer border ${
+              className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer border shrink-0 ${
                 activeFilter === 'music'
                   ? 'bg-white text-black border-white shadow-[0_4px_16px_rgba(255,255,255,0.2)]'
                   : 'bg-white/[0.08] border-white/10 text-white hover:bg-white/[0.15]'
@@ -303,7 +304,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
             </button>
             <button
               onClick={() => handleSelectFilter('podcasts')}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer border ${
+              className={`px-3.5 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer border shrink-0 ${
                 activeFilter === 'podcasts'
                   ? 'bg-white text-black border-white shadow-[0_4px_16px_rgba(255,255,255,0.2)]'
                   : 'bg-white/[0.08] border-white/10 text-white hover:bg-white/[0.15]'
@@ -346,78 +347,102 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
               </div>
             ) : (
               spotlightTrack && (
-                <div className="group relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.06] backdrop-blur-2xl p-5 sm:p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_50px_rgba(0,0,0,0.45)] transition-all duration-300 hover:border-white/25">
+                <div
+                  onMouseMove={handleSpotlightMove}
+                  className="group hover-spotlight relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-white/[0.06] p-3.5 sm:p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_50px_rgba(0,0,0,0.45)] transition-[background-color,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-white/30 hover:bg-white/[0.08]"
+                >
                   {/* Blurred Artwork Atmospheric Backdrop */}
                   <div className="absolute inset-0 pointer-events-none overflow-hidden">
                     <CoverArt
                       src={spotlightTrack.coverUrl}
                       fallbackSrc={spotlightTrack.fallbackCoverUrl}
                       alt=""
-                      className="w-full h-full object-cover blur-3xl scale-110 opacity-30"
+                      className="w-full h-full object-cover blur-xl scale-110 opacity-28"
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#090d12]/90 via-[#0b1219]/75 to-[#090d12]/85" />
-                    <div className="absolute -right-12 -top-12 w-64 h-64 rounded-full bg-[#1ed760]/18 blur-[80px] animate-ambient-drift" />
-                    <div className="absolute left-1/3 -bottom-16 w-64 h-64 rounded-full bg-[#6366f1]/15 blur-[90px] animate-ambient-drift" />
+                    <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(30,215,96,0.2)_0%,transparent_70%)] animate-ambient-drift" />
+                    <div className="absolute left-1/3 -bottom-24 w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.18)_0%,transparent_70%)] animate-ambient-drift" />
                   </div>
 
-                  <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7">
-                    {/* Spotlight Artwork */}
-                    <div
-                      onClick={() => onPlayTrack(spotlightTrack)}
-                      className="relative w-32 h-32 sm:w-44 sm:h-44 rounded-2xl overflow-hidden shrink-0 ring-1 ring-white/20 shadow-[0_16px_40px_rgba(0,0,0,0.6)] cursor-pointer"
-                    >
-                      <CoverArt
-                        src={spotlightTrack.coverUrl}
-                        fallbackSrc={spotlightTrack.fallbackCoverUrl}
-                        alt={spotlightTrack.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
-                      />
-                      {isSpotlightPlaying && (
-                        <div className="absolute left-2.5 bottom-2.5 px-2.5 py-1.5 rounded-full bg-black/75 backdrop-blur-md border border-[#1ed760]/40 flex items-center gap-1.5">
-                          <EqualizerBars />
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#1ed760]">
-                            Live
-                          </span>
+                  <div className="relative z-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-7 w-full min-w-0">
+                    {/* Mobile Compact Row: Artwork + Title/Artist side-by-side */}
+                    <div className="flex items-center gap-3.5 sm:contents min-w-0">
+                      <div
+                        onClick={() => onPlayTrack(spotlightTrack)}
+                        className="relative w-20 h-20 sm:w-44 sm:h-44 rounded-xl sm:rounded-2xl overflow-hidden shrink-0 ring-1 ring-white/20 shadow-[0_12px_32px_rgba(0,0,0,0.6)] cursor-pointer"
+                      >
+                        <CoverArt
+                          src={spotlightTrack.coverUrl}
+                          fallbackSrc={spotlightTrack.fallbackCoverUrl}
+                          alt={spotlightTrack.title}
+                          className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
+                        />
+                        {isSpotlightPlaying && (
+                          <div className="absolute left-1.5 bottom-1.5 sm:left-2 sm:bottom-2 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#1ed760]/40 flex items-center gap-1">
+                            <EqualizerBars />
+                            <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#1ed760]">
+                              Live
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Spotlight Metadata (visible right next to cover on mobile, part of right col on desktop) */}
+                      <div className="sm:hidden min-w-0 flex-1 space-y-1">
+                        <div className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#1ed760]">
+                          {isSpotlightPlaying ? (
+                            <EqualizerBars />
+                          ) : (
+                            <Sparkles className="w-3 h-3 shrink-0" />
+                          )}
+                          <span>{isSpotlightPlaying ? 'Now Playing' : 'Featured Spotlight'}</span>
                         </div>
-                      )}
+                        <h2 className="text-lg font-extrabold tracking-tight text-white truncate">
+                          {spotlightTrack.title}
+                        </h2>
+                        <p className="text-xs text-[#d4d4d4] truncate">
+                          <span className="font-semibold text-white">{spotlightTrack.artist}</span>
+                          {spotlightTrack.duration ? ` • ${formatTime(spotlightTrack.duration)}` : ''}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Spotlight Metadata & Actions */}
-                    <div className="min-w-0 flex-1 space-y-2.5">
-                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.08] border border-white/15 backdrop-blur-md">
+                    {/* Desktop Metadata + Shared Actions */}
+                    <div className="w-full min-w-0 flex-1 space-y-2">
+                      <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.08] border border-white/15 backdrop-blur-md">
                         {isSpotlightPlaying ? (
                           <EqualizerBars />
                         ) : (
-                          <span className="w-2 h-2 rounded-full bg-[#1ed760]" />
+                          <Sparkles className="w-3.5 h-3.5 text-[#1ed760]" />
                         )}
                         <span className="text-[11px] font-bold uppercase tracking-widest text-[#1ed760]">
                           {isSpotlightPlaying ? 'Now Playing' : 'Featured Spotlight'}
                         </span>
                       </div>
 
-                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white truncate">
+                      <h2 className="hidden sm:block text-3xl lg:text-4xl font-extrabold tracking-tight text-white truncate">
                         {spotlightTrack.title}
                       </h2>
 
-                      <p className="text-sm sm:text-base text-[#d4d4d4] truncate">
+                      <p className="hidden sm:block text-base text-[#d4d4d4] truncate">
                         <span className="font-semibold text-white">{spotlightTrack.artist}</span>
                         {spotlightTrack.album ? ` • ${spotlightTrack.album}` : ''}
                         {spotlightTrack.duration ? ` • ${formatTime(spotlightTrack.duration)}` : ''}
                       </p>
 
-                      <div className="flex flex-wrap items-center gap-3 pt-2">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-0.5 sm:pt-1.5">
                         <button
                           onClick={() => onPlayTrack(spotlightTrack)}
-                          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black font-bold text-sm shadow-[0_8px_24px_rgba(30,215,96,0.35)] hover:scale-105 transition-all duration-200 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black font-bold text-xs sm:text-sm shadow-[0_8px_24px_rgba(30,215,96,0.35)] hover:shadow-[0_12px_30px_rgba(30,215,96,0.5)] hover:-translate-y-0.5 hover:scale-[1.03] active:scale-95 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer whitespace-nowrap shrink-0"
                         >
                           {isSpotlightPlaying ? (
                             <>
-                              <Pause className="w-4 h-4 fill-current stroke-none" />
+                              <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current stroke-none" />
                               Pause
                             </>
                           ) : (
                             <>
-                              <Play className="w-4 h-4 fill-current stroke-none translate-x-[0.5px]" />
+                              <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current stroke-none translate-x-[0.5px]" />
                               Play Now
                             </>
                           )}
@@ -434,19 +459,20 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                               });
                             }
                           }}
-                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/[0.1] hover:bg-white/[0.18] border border-white/15 text-white font-semibold text-sm backdrop-blur-md transition-all duration-200 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-white/[0.1] hover:bg-white/[0.18] border border-white/15 hover:border-white/30 text-white font-semibold text-xs sm:text-sm backdrop-blur-md hover:-translate-y-0.5 active:scale-95 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer whitespace-nowrap shrink-0"
                         >
-                          <User className="w-4 h-4" />
-                          Explore Artist
+                          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          <span className="sm:hidden">Artist</span>
+                          <span className="hidden sm:inline">Explore Artist</span>
                         </button>
 
                         {activeFilter === 'all' && (
                           <button
                             onClick={() => handleSelectFilter('podcasts')}
-                            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.14] border border-white/10 text-[#d4d4d4] hover:text-white font-semibold text-sm backdrop-blur-md transition-all duration-200 cursor-pointer"
+                            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full bg-white/[0.06] hover:bg-white/[0.15] border border-white/10 hover:border-white/25 text-[#d4d4d4] hover:text-white font-semibold text-xs sm:text-sm backdrop-blur-md hover:-translate-y-0.5 active:scale-95 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer whitespace-nowrap shrink-0"
                           >
-                            <Podcast className="w-4 h-4 text-[#1ed760]" />
-                            Podcasts Hub
+                            <Podcast className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#1ed760]" />
+                            <span>Podcasts</span>
                           </button>
                         )}
                       </div>
@@ -458,17 +484,17 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
           </section>
         )}
 
-        {/* Quick Access 6-Grid */}
+        {/* Quick Access 6-Grid (2-col on mobile like Spotify Mobile, 3-col on desktop) */}
         {activeFilter !== 'podcasts' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-up">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 animate-fade-up">
             {isLoading && quickItems.length <= 1
               ? Array.from({ length: 6 }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center bg-white/[0.06] border border-white/10 rounded-2xl overflow-hidden h-16 animate-pulse"
+                    className="flex items-center bg-white/[0.06] border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden h-14 sm:h-16 animate-pulse"
                   >
-                    <div className="w-16 h-16 bg-white/10 shrink-0" />
-                    <div className="h-4 bg-white/10 rounded w-32 ml-3" />
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/10 shrink-0" />
+                    <div className="h-3.5 bg-white/10 rounded w-20 sm:w-32 ml-2.5 sm:ml-3" />
                   </div>
                 ))
               : quickItems.map((item) => {
@@ -483,6 +509,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                   return (
                     <div
                       key={`${item.type}-${item.id}`}
+                      onMouseMove={handleSpotlightMove}
                       onClick={() => {
                         if (item.type === 'playlist') {
                           setViewState({ type: 'playlist', id: item.id });
@@ -492,16 +519,16 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                           setViewState({ type: 'artist', id: item.id });
                         }
                       }}
-                      className={`group flex items-center bg-white/[0.07] hover:bg-white/[0.14] backdrop-blur-xl border rounded-2xl overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-200 hover:-translate-y-0.5 cursor-pointer relative pr-4 p-1.5 gap-3 ${
+                      className={`group hover-spotlight flex items-center bg-white/[0.07] hover:bg-white/[0.14] border rounded-xl sm:rounded-2xl overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_rgba(0,0,0,0.3)] transition-[transform,background-color,border-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:scale-[0.985] cursor-pointer relative pr-2 sm:pr-4 p-1 sm:p-1.5 gap-2 sm:gap-3 min-w-0 ${
                         isItemPlaying
                           ? 'border-[#1ed760]/45 bg-white/[0.12]'
                           : 'border-white/10 hover:border-white/25'
                       }`}
                     >
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden shrink-0 ring-1 ring-white/15 shadow-md">
+                      <div className="relative w-11 h-11 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl overflow-hidden shrink-0 ring-1 ring-white/15 shadow-md">
                         {item.isLikedSongs ? (
                           <div className="w-full h-full bg-gradient-to-br from-[#450af5] to-[#8e8ee5] flex items-center justify-center transition-transform duration-300 group-hover:scale-[1.06]">
-                            <Heart className="w-6 h-6 text-white fill-white" />
+                            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
                           </div>
                         ) : (
                           <CoverArt
@@ -513,7 +540,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                         )}
                       </div>
                       <span
-                        className={`font-bold text-sm flex-1 truncate pr-1 group-hover:pr-11 transition-all ${
+                        className={`font-bold text-[11px] sm:text-sm leading-tight line-clamp-2 sm:line-clamp-none sm:truncate flex-1 pr-0.5 sm:pr-11 ${
                           isItemPlaying ? 'text-[#1ed760]' : 'text-white'
                         }`}
                       >
@@ -521,7 +548,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                       </span>
 
                       {isItemPlaying && (
-                        <EqualizerBars className="mr-12 group-hover:opacity-0 transition-opacity" />
+                        <EqualizerBars className="hidden sm:inline-flex mr-12 group-hover:opacity-0 transition-opacity" />
                       )}
 
                       <button
@@ -532,10 +559,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                           else if (item.type === 'artist') onPlayArtist(item.data as Artist);
                         }}
                         aria-label={`Play ${item.title}`}
-                        className={`absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#1ed760] text-black shadow-xl flex items-center justify-center transition-all duration-200 hover:scale-105 cursor-pointer ${
+                        className={`hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-xl items-center justify-center transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-110 active:scale-95 cursor-pointer ${
                           isItemPlaying
                             ? 'opacity-100 scale-100'
-                            : 'opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100'
+                            : 'opacity-0 scale-75 group-hover:opacity-100 group-hover:scale-100'
                         }`}
                       >
                         {isItemPlaying ? (
@@ -553,22 +580,23 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
         {/* Browse by Mood & Genre Vibes */}
         {activeFilter !== 'podcasts' && (
           <section className="animate-fade-up">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#1ed760]" />
-                <h2 className="text-xl sm:text-2xl font-bold text-white">
+            <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
+              <div className="flex items-center gap-2 min-w-0">
+                <Sparkles className="w-5 h-5 text-[#1ed760] shrink-0" />
+                <h2 className="text-lg sm:text-2xl font-bold text-white truncate">
                   Browse by Mood &amp; Vibes
                 </h2>
               </div>
-              <span className="text-xs font-medium text-[#a7a7a7]">
+              <span className="hidden sm:inline text-xs font-medium text-[#a7a7a7] shrink-0">
                 Tap any mood to explore live
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
               {VIBE_TILES.map((vibe) => (
                 <button
                   key={vibe.id}
+                  onMouseMove={handleSpotlightMove}
                   onClick={() => {
                     if (vibe.isPodcastTile) {
                       handleSelectFilter('podcasts');
@@ -576,16 +604,16 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                       setViewState({ type: 'search', searchQuery: vibe.query });
                     }
                   }}
-                  className={`group text-left bg-gradient-to-br ${vibe.gradient} backdrop-blur-xl border border-white/10 hover:border-white/25 rounded-2xl p-3.5 sm:p-4 transition-all duration-300 hover:-translate-y-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.45)] cursor-pointer flex items-center gap-3`}
+                  className={`group hover-spotlight card-hover-lift text-left bg-gradient-to-br ${vibe.gradient} border border-white/10 hover:border-white/30 rounded-2xl p-2.5 sm:p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_8px_24px_rgba(0,0,0,0.3)] cursor-pointer flex items-center gap-2.5 sm:gap-3 min-w-0`}
                 >
                   <div
-                    className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110 ${vibe.iconBg}`}
+                    className={`relative z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:-rotate-3 ${vibe.iconBg}`}
                   >
                     {renderVibeIcon(vibe.icon)}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-sm text-white truncate">{vibe.title}</h3>
-                    <p className="text-[11px] text-[#b3b3b3] truncate mt-0.5">{vibe.subtitle}</p>
+                  <div className="relative z-10 min-w-0 flex-1">
+                    <h3 className="font-bold text-xs sm:text-sm text-white truncate transition-colors group-hover:text-white">{vibe.title}</h3>
+                    <p className="text-[10px] sm:text-[11px] text-[#b3b3b3] truncate mt-0.5 transition-colors group-hover:text-white/80">{vibe.subtitle}</p>
                   </div>
                 </button>
               ))}
@@ -633,11 +661,12 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                     return (
                       <div
                         key={`chart-${track.id}`}
+                        onMouseMove={handleSpotlightMove}
                         onClick={() => onPlayTrack(track)}
-                        className={`group flex items-center gap-3.5 p-3 rounded-2xl backdrop-blur-xl border transition-all duration-200 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${
+                        className={`group hover-spotlight flex items-center gap-3.5 p-3 rounded-2xl border transition-[transform,background-color,border-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] hover:translate-x-1 active:scale-[0.99] cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${
                           isThisPlaying
                             ? 'bg-[#1ed760]/12 border-[#1ed760]/40'
-                            : 'bg-white/[0.05] hover:bg-white/[0.11] border-white/[0.08] hover:border-white/20'
+                            : 'bg-white/[0.05] hover:bg-white/[0.12] border-white/[0.08] hover:border-white/25'
                         }`}
                       >
                         <span
@@ -750,8 +779,9 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                       return (
                         <div
                           key={episode.id}
+                          onMouseMove={handleSpotlightMove}
                           onClick={() => onPlayTrack(episode, podcastEpisodes)}
-                          className={`group flex items-center gap-3.5 p-3 rounded-2xl backdrop-blur-xl border transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] relative pr-14 ${
+                          className={`group hover-spotlight card-hover-lift flex items-center gap-3.5 p-3 rounded-2xl border cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] relative pr-14 ${
                             isThisPlaying
                               ? 'bg-[#1ed760]/12 border-[#1ed760]/40'
                               : 'bg-white/[0.06] hover:bg-white/[0.12] border-white/10 hover:border-white/25'
@@ -837,15 +867,16 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                       return (
                         <div
                           key={show.id}
+                          onMouseMove={handleSpotlightMove}
                           onClick={() => setViewState({ type: 'artist', id: show.id })}
-                          className="group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border border-white/[0.08] hover:border-white/25 p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)]"
+                          className="group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/25 p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)]"
                         >
                           <div className="relative aspect-square w-full mb-3 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-lg">
                             <CoverArt
                               src={show.avatarUrl}
                               fallbackSrc={show.fallbackAvatarUrl}
                               alt={show.name}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                              className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                             />
                             <button
                               onClick={(e) => {
@@ -853,10 +884,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                                 onPlayArtist(show);
                               }}
                               aria-label={`Play ${show.name}`}
-                              className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                              className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                                 isShowPlaying
                                   ? 'opacity-100 scale-100 translate-y-0'
-                                  : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                  : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                               }`}
                             >
                               {isShowPlaying ? (
@@ -902,15 +933,16 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                       return (
                         <div
                           key={playlist.id}
+                          onMouseMove={handleSpotlightMove}
                           onClick={() => setViewState({ type: 'playlist', id: playlist.id })}
-                          className="group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border border-white/[0.08] hover:border-white/25 p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)]"
+                          className="group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/25 p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)]"
                         >
                           <div className="relative aspect-square w-full mb-3 rounded-xl overflow-hidden ring-1 ring-white/15 shadow-md">
                             <CoverArt
                               src={playlist.coverUrl}
                               fallbackSrc={playlist.fallbackCoverUrl}
                               alt={playlist.title}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                              className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                             />
                             <button
                               onClick={(e) => {
@@ -918,10 +950,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                                 onPlayPlaylist(playlist);
                               }}
                               aria-label={`Play ${playlist.title}`}
-                              className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                              className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                                 isPlPlaying
                                   ? 'opacity-100 scale-100 translate-y-0'
-                                  : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                  : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                               }`}
                             >
                               {isPlPlaying ? (
@@ -981,8 +1013,9 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                     return (
                       <div
                         key={track.id}
+                        onMouseMove={handleSpotlightMove}
                         onClick={() => onPlayTrack(track)}
-                        className={`group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
+                        className={`group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
                           isThisPlaying
                             ? 'border-[#1ed760]/45 bg-white/[0.09]'
                             : 'border-white/[0.08] hover:border-white/25'
@@ -993,7 +1026,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                             src={track.coverUrl}
                             fallbackSrc={track.fallbackCoverUrl}
                             alt={track.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                            className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                           />
                           {isThisPlaying && (
                             <div className="absolute left-2 bottom-2 px-2 py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#1ed760]/40 flex items-center">
@@ -1006,10 +1039,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                               onPlayTrack(track);
                             }}
                             aria-label={`Play ${track.title}`}
-                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                               isThisPlaying
                                 ? 'opacity-100 scale-100 translate-y-0'
-                                : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                             }`}
                           >
                             {isThisPlaying ? (
@@ -1073,8 +1106,9 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                     return (
                       <div
                         key={`fresh-${track.id}`}
+                        onMouseMove={handleSpotlightMove}
                         onClick={() => onPlayTrack(track, freshTracks)}
-                        className={`group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
+                        className={`group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
                           isThisPlaying
                             ? 'border-[#1ed760]/45 bg-white/[0.09]'
                             : 'border-white/[0.08] hover:border-white/25'
@@ -1085,7 +1119,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                             src={track.coverUrl}
                             fallbackSrc={track.fallbackCoverUrl}
                             alt={track.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                            className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                           />
                           {isThisPlaying && (
                             <div className="absolute left-2 bottom-2 px-2 py-1 rounded-full bg-black/75 backdrop-blur-md border border-[#1ed760]/40 flex items-center">
@@ -1098,10 +1132,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                               onPlayTrack(track, freshTracks);
                             }}
                             aria-label={`Play ${track.title}`}
-                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                               isThisPlaying
                                 ? 'opacity-100 scale-100 translate-y-0'
-                                : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                             }`}
                           >
                             {isThisPlaying ? (
@@ -1165,8 +1199,9 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                       return (
                         <div
                           key={`home-pod-${episode.id}`}
+                          onMouseMove={handleSpotlightMove}
                           onClick={() => onPlayTrack(episode, podcastEpisodes)}
-                          className={`group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
+                          className={`group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
                             isThisPlaying
                               ? 'border-[#1ed760]/45 bg-white/[0.09]'
                               : 'border-white/[0.08] hover:border-white/25'
@@ -1177,7 +1212,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                               src={episode.coverUrl}
                               fallbackSrc={episode.fallbackCoverUrl}
                               alt={episode.title}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                              className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                             />
                             <span className="absolute left-2 top-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md border border-white/15 text-[10px] font-bold text-[#1ed760]">
                               {formatTime(episode.duration)}
@@ -1193,10 +1228,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                                 onPlayTrack(episode, podcastEpisodes);
                               }}
                               aria-label={`Play ${episode.title}`}
-                              className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                              className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                                 isThisPlaying
                                   ? 'opacity-100 scale-100 translate-y-0'
-                                  : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                  : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                               }`}
                             >
                               {isThisPlaying ? (
@@ -1259,20 +1294,21 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                     return (
                       <div
                         key={artist.id}
+                        onMouseMove={handleSpotlightMove}
                         onClick={() => setViewState({ type: 'artist', id: artist.id })}
-                        className={`group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
+                        className={`group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
                           isArtistPlaying
                             ? 'border-[#1ed760]/45 bg-white/[0.09]'
                             : 'border-white/[0.08] hover:border-white/25'
                         }`}
                       >
                         <div className="relative aspect-square w-full mb-3">
-                          <div className="w-full h-full rounded-full overflow-hidden ring-1 ring-white/15 group-hover:ring-[#1ed760]/40 shadow-lg transition-all duration-300">
+                          <div className="w-full h-full rounded-full overflow-hidden ring-1 ring-white/15 group-hover:ring-[#1ed760]/50 shadow-lg transition-all duration-300">
                             <CoverArt
                               src={artist.avatarUrl}
                               fallbackSrc={artist.fallbackAvatarUrl}
                               alt={artist.name}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.07]"
+                              className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.08]"
                             />
                           </div>
                           <button
@@ -1281,10 +1317,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                               onPlayArtist(artist);
                             }}
                             aria-label={`Play ${artist.name}`}
-                            className={`absolute right-1 bottom-1 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                            className={`absolute right-1 bottom-1 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                               isArtistPlaying
                                 ? 'opacity-100 scale-100 translate-y-0'
-                                : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                             }`}
                           >
                             {isArtistPlaying ? (
@@ -1342,8 +1378,9 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                     return (
                       <div
                         key={album.id}
+                        onMouseMove={handleSpotlightMove}
                         onClick={() => setViewState({ type: 'album', id: album.id })}
-                        className={`group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
+                        className={`group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
                           isAlbumPlaying
                             ? 'border-[#1ed760]/45 bg-white/[0.09]'
                             : 'border-white/[0.08] hover:border-white/25'
@@ -1354,7 +1391,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                             src={album.coverUrl}
                             fallbackSrc={album.fallbackCoverUrl}
                             alt={album.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                            className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                           />
                           <button
                             onClick={(e) => {
@@ -1362,10 +1399,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                               onPlayAlbum(album);
                             }}
                             aria-label={`Play ${album.title}`}
-                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                               isAlbumPlaying
                                 ? 'opacity-100 scale-100 translate-y-0'
-                                : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                             }`}
                           >
                             {isAlbumPlaying ? (
@@ -1421,8 +1458,9 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                     return (
                       <div
                         key={playlist.id}
+                        onMouseMove={handleSpotlightMove}
                         onClick={() => setViewState({ type: 'playlist', id: playlist.id })}
-                        className={`group bg-white/[0.05] hover:bg-white/[0.11] backdrop-blur-xl border p-3.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
+                        className={`group hover-spotlight card-hover-lift bg-white/[0.05] hover:bg-white/[0.12] border p-3.5 rounded-2xl cursor-pointer flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_28px_rgba(0,0,0,0.3)] ${
                           isPlPlaying
                             ? 'border-[#1ed760]/45 bg-white/[0.09]'
                             : 'border-white/[0.08] hover:border-white/25'
@@ -1433,7 +1471,7 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                             src={playlist.coverUrl}
                             fallbackSrc={playlist.fallbackCoverUrl}
                             alt={playlist.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                            className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                           />
                           <button
                             onClick={(e) => {
@@ -1441,10 +1479,10 @@ export const HomeFeed: React.FC<HomeFeedProps> = ({
                               onPlayPlaylist(playlist);
                             }}
                             aria-label={`Play ${playlist.title}`}
-                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] text-black shadow-2xl flex items-center justify-center hover:scale-105 transition-all duration-200 cursor-pointer ${
+                            className={`absolute right-2 bottom-2 w-11 h-11 rounded-full bg-[#1ed760] hover:bg-[#1fdf64] text-black shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-[transform,opacity,background-color] duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer ${
                               isPlPlaying
                                 ? 'opacity-100 scale-100 translate-y-0'
-                                : 'opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0'
+                                : 'opacity-0 scale-90 translate-y-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-y-0'
                             }`}
                           >
                             {isPlPlaying ? (

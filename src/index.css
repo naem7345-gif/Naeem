@@ -41,7 +41,7 @@ input[type="range"] {
 
 @keyframes eqBounce {
   0%, 100% {
-    transform: scaleY(0.28);
+    transform: scaleY(0.25);
   }
   50% {
     transform: scaleY(1);
@@ -53,14 +53,25 @@ input[type="range"] {
     transform: translate3d(0, 0, 0) scale(1);
   }
   50% {
-    transform: translate3d(14px, -10px, 0) scale(1.06);
+    transform: translate3d(16px, -12px, 0) scale(1.06);
   }
 }
 
 @keyframes fadeSlideUp {
   from {
     opacity: 0;
-    transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 14px, 0) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes drawerSlideLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-24px, 0, 0);
   }
   to {
     opacity: 1;
@@ -68,25 +79,627 @@ input[type="range"] {
   }
 }
 
+@keyframes drawerSlideRight {
+  from {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes drawerSlideUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 .animate-eq-1 {
   transform-origin: bottom;
-  animation: eqBounce 0.75s ease-in-out infinite;
+  will-change: transform;
+  animation: eqBounce 0.72s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 .animate-eq-2 {
   transform-origin: bottom;
-  animation: eqBounce 0.6s ease-in-out 0.2s infinite;
+  will-change: transform;
+  animation: eqBounce 0.58s cubic-bezier(0.45, 0, 0.55, 1) 0.18s infinite;
 }
 
 .animate-eq-3 {
   transform-origin: bottom;
-  animation: eqBounce 0.85s ease-in-out 0.35s infinite;
+  will-change: transform;
+  animation: eqBounce 0.82s cubic-bezier(0.45, 0, 0.55, 1) 0.34s infinite;
 }
 
 .animate-ambient-drift {
-  animation: ambientDrift 10s ease-in-out infinite;
+  will-change: transform;
+  animation: ambientDrift 12s cubic-bezier(0.37, 0, 0.63, 1) infinite;
 }
 
 .animate-fade-up {
-  animation: fadeSlideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: fadeSlideUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-drawer-left {
+  animation: drawerSlideLeft 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-drawer-right {
+  animation: drawerSlideRight 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-drawer-up {
+  animation: drawerSlideUp 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-modal-pop {
+  animation: modalPopIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Silky GPU-composited shutter glide for desktop Your Library box (no box-shadow paint animation) */
+.shutter-panel {
+  transition:
+    width 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: width;
+  contain: layout style paint;
+}
+
+/* Mouse-following radial cursor spotlight on interactive cards & tiles */
+.hover-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+
+.hover-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    260px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(30, 215, 96, 0.14),
+    rgba(255, 255, 255, 0.05) 44%,
+    transparent 74%
+  );
+  transition: opacity 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity;
+  z-index: 1;
+}
+
+.hover-spotlight:hover::after {
+  opacity: 1;
+}
+
+/* Smooth GPU-composited card elevation on hover (no box-shadow paint interpolation) */
+.card-hover-lift {
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.card-hover-lift:hover {
+  transform: translate3d(0, -4px, 0);
+}
+
+.card-hover-lift:active {
+  transform: translate3d(0, -1px, 0) scale3d(0.985, 0.985, 1);
+}
+
+/* Home button tactile spring, orbiting ring & click ripple (pure transform/opacity) */
+@keyframes homeRingOrbit {
+  from {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg);
+  }
+}
+
+@keyframes homeIconPop {
+  0% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  38% {
+    transform: translate3d(0, -2px, 0) scale3d(1.22, 1.22, 1) rotate(-6deg);
+  }
+  70% {
+    transform: translate3d(0, 0.5px, 0) scale3d(0.95, 0.95, 1) rotate(2deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1) rotate(0deg);
+  }
+}
+
+@keyframes homeClickRipple {
+  0% {
+    transform: scale3d(0.72, 0.72, 1);
+    opacity: 0.72;
+  }
+  100% {
+    transform: scale3d(1.52, 1.52, 1);
+    opacity: 0;
+  }
+}
+
+.animate-home-orbit {
+  animation: homeRingOrbit 6s linear infinite;
+  will-change: transform;
+}
+
+.animate-home-pop {
+  animation: homeIconPop 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+}
+
+.animate-home-ripple {
+  animation: homeClickRipple 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* Search bar outline Liquid Metal flow & glass sheen (pure GPU translate3d + rotate) */
+@keyframes searchLiquidFlowCW {
+  from {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(1.06, 0.94, 1);
+  }
+  50% {
+    transform: translate3d(-50%, -50%, 0) rotate(180deg) scale3d(0.96, 1.06, 1);
+  }
+  to {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg) scale3d(1.06, 0.94, 1);
+  }
+}
+
+@keyframes searchLiquidFlowCCW {
+  from {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg) scale3d(0.95, 1.05, 1);
+  }
+  50% {
+    transform: translate3d(-50%, -50%, 0) rotate(180deg) scale3d(1.05, 0.95, 1);
+  }
+  to {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg) scale3d(0.95, 1.05, 1);
+  }
+}
+
+@keyframes searchSheen {
+  0%, 58% {
+    transform: translate3d(-140%, 0, 0) skewX(-20deg);
+    opacity: 0;
+  }
+  68% {
+    opacity: 0.75;
+  }
+  88% {
+    transform: translate3d(280%, 0, 0) skewX(-20deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(280%, 0, 0) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.animate-search-liquid-primary {
+  animation: searchLiquidFlowCW 7.5s linear infinite;
+  will-change: transform;
+}
+
+.animate-search-liquid-secondary {
+  animation: searchLiquidFlowCCW 11s linear infinite;
+  will-change: transform;
+}
+
+@media (min-width: 768px) {
+  .animate-search-sheen {
+    animation: searchSheen 5.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    will-change: transform, opacity;
+  }
+  .desktop-search-spotlight {
+    position: relative;
+  }
+  .desktop-search-spotlight::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      220px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(30, 215, 96, 0.16),
+      rgba(255, 255, 255, 0.06) 46%,
+      transparent 74%
+    );
+    transition: opacity 260ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity;
+    z-index: 1;
+  }
+  .desktop-search-spotlight:hover::after {
+    opacity: 1;
+  }
+}
+
+/* Mini Player Card GPU-composited 3D Water Bubble Effect & Animations */
+@keyframes waterCausticDrift {
+  0% {
+    transform: rotate(0deg) scale3d(1, 0.94, 1);
+  }
+  50% {
+    transform: rotate(180deg) scale3d(0.94, 1.06, 1);
+  }
+  100% {
+    transform: rotate(360deg) scale3d(1, 0.94, 1);
+  }
+}
+
+@keyframes waterSurfaceFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+  33% {
+    transform: translate3d(0, -0.75px, 0) scale3d(1.03, 0.97, 1);
+  }
+  66% {
+    transform: translate3d(0, 0.5px, 0) scale3d(0.975, 1.03, 1);
+  }
+}
+
+@keyframes waterBubbleJelly {
+  0% {
+    transform: scale3d(1, 1, 1);
+  }
+  20% {
+    transform: scale3d(1.26, 0.76, 1);
+  }
+  42% {
+    transform: scale3d(0.84, 1.2, 1);
+  }
+  64% {
+    transform: scale3d(1.1, 0.91, 1);
+  }
+  82% {
+    transform: scale3d(0.96, 1.05, 1);
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes waterRippleWave1 {
+  0% {
+    transform: scale3d(0.75, 0.75, 1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale3d(1.88, 1.88, 1);
+    opacity: 0;
+  }
+}
+
+@keyframes waterRippleWave2 {
+  0% {
+    transform: scale3d(0.82, 0.82, 1);
+    opacity: 0.72;
+  }
+  100% {
+    transform: scale3d(2.22, 2.22, 1);
+    opacity: 0;
+  }
+}
+
+@keyframes waterDropletRise1 {
+  0% {
+    transform: translate3d(0, 6px, 0) scale3d(0.35, 0.35, 1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  55% {
+    transform: translate3d(-7px, -11px, 0) scale3d(1.12, 0.94, 1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(-3px, -25px, 0) scale3d(0.85, 1.05, 1);
+    opacity: 0;
+  }
+}
+
+@keyframes waterDropletRise2 {
+  0% {
+    transform: translate3d(0, 5px, 0) scale3d(0.35, 0.35, 1);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.92;
+  }
+  58% {
+    transform: translate3d(8px, -13px, 0) scale3d(0.95, 1.12, 1);
+    opacity: 0.82;
+  }
+  100% {
+    transform: translate3d(5px, -27px, 0) scale3d(0.75, 0.9, 1);
+    opacity: 0;
+  }
+}
+
+@keyframes waterDropletRise3 {
+  0% {
+    transform: translate3d(2px, 4px, 0) scale3d(0.3, 0.3, 1);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.88;
+  }
+  62% {
+    transform: translate3d(-11px, -8px, 0) scale3d(1.06, 0.95, 1);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(-14px, -20px, 0) scale3d(0.7, 0.7, 1);
+    opacity: 0;
+  }
+}
+
+@keyframes waterDropletRise4 {
+  0% {
+    transform: translate3d(-2px, 4px, 0) scale3d(0.35, 0.35, 1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  55% {
+    transform: translate3d(10px, -9px, 0) scale3d(1.15, 0.92, 1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(13px, -23px, 0) scale3d(0.82, 0.95, 1);
+    opacity: 0;
+  }
+}
+
+.player-bubble-btn {
+  transition:
+    transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.player-bubble-btn:hover:not(:disabled) {
+  transform: scale3d(1.13, 1.13, 1);
+}
+
+.player-bubble-btn:active:not(:disabled) {
+  transform: scale3d(0.86, 0.9, 1);
+}
+
+.player-bubble-glass {
+  background: radial-gradient(
+    120% 120% at 30% 22%,
+    rgba(165, 243, 252, 0.16) 0%,
+    rgba(56, 189, 248, 0.08) 42%,
+    rgba(15, 23, 42, 0.28) 100%
+  );
+  border: 1px solid rgba(165, 243, 252, 0.32);
+  box-shadow:
+    inset 0 2px 4px rgba(224, 242, 254, 0.42),
+    inset 0 -3px 6px rgba(34, 211, 238, 0.22),
+    0 4px 12px rgba(6, 182, 212, 0.14);
+}
+
+.player-bubble-glass:hover:not(:disabled) {
+  background: radial-gradient(
+    120% 120% at 30% 22%,
+    rgba(165, 243, 252, 0.28) 0%,
+    rgba(30, 215, 96, 0.14) 48%,
+    rgba(15, 23, 42, 0.22) 100%
+  );
+  border-color: rgba(165, 243, 252, 0.62);
+}
+
+.player-bubble-primary {
+  background: radial-gradient(
+    115% 115% at 30% 20%,
+    #ffffff 0%,
+    #e0f7ff 58%,
+    #a5f3fc 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    inset 0 3px 5px rgba(255, 255, 255, 0.95),
+    inset 0 -4px 8px rgba(34, 211, 238, 0.38),
+    0 6px 20px rgba(103, 232, 249, 0.32);
+}
+
+.player-bubble-pill {
+  border-color: rgba(165, 243, 252, 0.34);
+  box-shadow:
+    inset 0 1.5px 3px rgba(224, 242, 254, 0.42),
+    inset 0 -2px 5px rgba(34, 211, 238, 0.22),
+    0 4px 12px rgba(6, 182, 212, 0.14);
+}
+
+.water-bubble-caustic {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(165, 243, 252, 0.22) 70deg,
+    rgba(30, 215, 96, 0.18) 140deg,
+    transparent 210deg,
+    rgba(255, 255, 255, 0.18) 290deg,
+    transparent 360deg
+  );
+  opacity: 0.72;
+  animation: waterCausticDrift 6.5s linear infinite;
+  will-change: transform;
+}
+
+.player-bubble-dome {
+  background:
+    radial-gradient(
+      115% 75% at 30% 14%,
+      rgba(255, 255, 255, 0.52) 0%,
+      rgba(186, 230, 253, 0.18) 34%,
+      transparent 62%
+    ),
+    radial-gradient(
+      90% 60% at 72% 86%,
+      rgba(103, 232, 249, 0.34) 0%,
+      rgba(30, 215, 96, 0.14) 36%,
+      transparent 68%
+    );
+  opacity: 0.82;
+  transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.player-bubble-btn:hover .player-bubble-dome {
+  opacity: 1;
+}
+
+.water-bubble-glint {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(224, 242, 254, 0.45) 45%,
+    transparent 78%
+  );
+  transform: rotate(-28deg);
+  opacity: 0.85;
+}
+
+.water-bubble-glint-secondary {
+  background: radial-gradient(
+    circle at center,
+    rgba(186, 230, 253, 0.85) 0%,
+    transparent 75%
+  );
+  opacity: 0.75;
+}
+
+.water-micro-bubble {
+  background: radial-gradient(
+    circle at 30% 28%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(165, 243, 252, 0.35) 36%,
+    rgba(56, 189, 248, 0.12) 72%,
+    rgba(165, 243, 252, 0.55) 100%
+  );
+  border: 1px solid rgba(207, 250, 254, 0.85);
+}
+
+.animate-water-float {
+  animation: waterSurfaceFloat 4.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-water-jelly {
+  animation: waterBubbleJelly 540ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  will-change: transform;
+}
+
+.animate-water-ripple-1 {
+  animation: waterRippleWave1 580ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-water-ripple-2 {
+  animation: waterRippleWave2 720ms cubic-bezier(0.22, 1, 0.36, 1) 95ms forwards;
+  will-change: transform, opacity;
+}
+
+.animate-water-droplet-1 {
+  animation: waterDropletRise1 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-water-droplet-2 {
+  animation: waterDropletRise2 760ms cubic-bezier(0.22, 1, 0.36, 1) 50ms forwards;
+  will-change: transform, opacity;
+}
+
+.animate-water-droplet-3 {
+  animation: waterDropletRise3 680ms cubic-bezier(0.22, 1, 0.36, 1) 30ms forwards;
+  will-change: transform, opacity;
+}
+
+.animate-water-droplet-4 {
+  animation: waterDropletRise4 780ms cubic-bezier(0.22, 1, 0.36, 1) 80ms forwards;
+  will-change: transform, opacity;
+}
+
+/* Hide scrollbars cleanly where .no-scrollbar is used */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-eq-1,
+  .animate-eq-2,
+  .animate-eq-3,
+  .animate-ambient-drift,
+  .animate-fade-up,
+  .animate-drawer-left,
+  .animate-drawer-right,
+  .animate-drawer-up,
+  .animate-modal-pop,
+  .animate-home-orbit,
+  .animate-home-pop,
+  .animate-home-ripple,
+  .animate-search-liquid-primary,
+  .animate-search-liquid-secondary,
+  .animate-search-sheen,
+  .water-bubble-caustic,
+  .animate-water-float,
+  .animate-water-jelly,
+  .animate-water-ripple-1,
+  .animate-water-ripple-2,
+  .animate-water-droplet-1,
+  .animate-water-droplet-2,
+  .animate-water-droplet-3,
+  .animate-water-droplet-4 {
+    animation: none !important;
+  }
+  .shutter-panel,
+  .card-hover-lift,
+  .hover-spotlight::after,
+  .desktop-search-spotlight::after,
+  .player-bubble-btn,
+  .player-bubble-dome {
+    transition: none !important;
+  }
+  .card-hover-lift:hover,
+  .player-bubble-btn:hover:not(:disabled) {
+    transform: none;
+  }
 }

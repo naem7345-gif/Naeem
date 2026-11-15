@@ -3,6 +3,7 @@ import { X, Heart, MoreHorizontal, Play } from 'lucide-react';
 import { Track, Artist } from '../types/spotify';
 import { getArtistDetails, getRelatedTracks } from '../services/musicApi';
 import { CoverArt } from './CoverArt';
+import { handleSpotlightMove } from '../utils/hoverSpotlight';
 
 interface NowPlayingDrawerProps {
   currentTrack: Track | null;
@@ -66,7 +67,14 @@ export const NowPlayingDrawer: React.FC<NowPlayingDrawerProps> = ({
   const queueTrack = nextTrack || relatedNext;
 
   return (
-    <aside className="w-80 h-full bg-white/[0.05] backdrop-blur-2xl border border-white/10 rounded-3xl p-4 flex flex-col gap-4 overflow-y-auto no-scrollbar select-none shrink-0 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_16px_40px_rgba(0,0,0,0.45)]">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-[60] bg-black/75 backdrop-blur-sm flex justify-end p-2 lg:static lg:inset-auto lg:z-auto lg:bg-transparent lg:backdrop-blur-none lg:p-0"
+    >
+      <aside
+        onClick={(e) => e.stopPropagation()}
+        className="animate-drawer-right w-full max-w-[360px] lg:w-80 h-full bg-[#10141c]/95 lg:bg-white/[0.05] backdrop-blur-2xl border border-white/15 lg:border-white/10 rounded-3xl p-4 flex flex-col gap-4 overflow-y-auto no-scrollbar select-none shrink-0 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_50px_rgba(0,0,0,0.65)]"
+      >
       {/* Header */}
       <div className="flex items-center justify-between text-white">
         <h2 className="font-bold text-base hover:underline cursor-pointer truncate pr-2">
@@ -82,12 +90,12 @@ export const NowPlayingDrawer: React.FC<NowPlayingDrawerProps> = ({
       </div>
 
       {/* Large Cover Art */}
-      <div className="relative rounded-2xl overflow-hidden ring-1 ring-white/15 shadow-2xl aspect-square w-full">
+      <div className="group relative rounded-2xl overflow-hidden ring-1 ring-white/15 shadow-2xl aspect-square w-full">
         <CoverArt
           src={currentTrack.coverUrl}
           fallbackSrc={currentTrack.fallbackCoverUrl}
           alt={currentTrack.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
         />
       </div>
 
@@ -155,7 +163,10 @@ export const NowPlayingDrawer: React.FC<NowPlayingDrawerProps> = ({
 
       {/* Next In Queue Card */}
       {queueTrack && (
-        <div className="bg-white/[0.06] backdrop-blur-xl border border-white/10 p-3 rounded-2xl space-y-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+        <div
+          onMouseMove={handleSpotlightMove}
+          className="hover-spotlight bg-white/[0.06] backdrop-blur-xl border border-white/10 hover:border-white/20 p-3 rounded-2xl space-y-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] transition-colors duration-200"
+        >
           <div className="flex items-center justify-between text-xs font-bold text-[#b3b3b3]">
             <span>Next in queue</span>
             <button
@@ -167,14 +178,14 @@ export const NowPlayingDrawer: React.FC<NowPlayingDrawerProps> = ({
           </div>
           <div
             onClick={() => (nextTrack ? onPlayNext() : onPlayTrack(queueTrack))}
-            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer group"
+            className="flex items-center gap-3 p-1.5 rounded-xl hover:bg-white/[0.08] transition-all duration-200 hover:translate-x-0.5 cursor-pointer group"
           >
             <div className="relative w-10 h-10 shrink-0 rounded-xl overflow-hidden ring-1 ring-white/20">
               <CoverArt
                 src={queueTrack.coverUrl}
                 fallbackSrc={queueTrack.fallbackCoverUrl}
                 alt={queueTrack.title}
-                className="w-full h-full object-cover shadow"
+                className="w-full h-full object-cover shadow transition-transform duration-300 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/40 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                 <Play className="w-4 h-4 fill-current translate-x-0.5" />
@@ -191,8 +202,9 @@ export const NowPlayingDrawer: React.FC<NowPlayingDrawerProps> = ({
       {/* Lyrics Snippet Card */}
       {currentTrack.lyrics && currentTrack.lyrics.length > 0 && (
         <div
+          onMouseMove={handleSpotlightMove}
           onClick={onOpenLyrics}
-          className="bg-gradient-to-br from-[#1e4a38]/80 to-white/[0.05] backdrop-blur-xl border border-white/15 p-4 rounded-2xl cursor-pointer hover:scale-[1.01] transition-transform shadow-md"
+          className="hover-spotlight bg-gradient-to-br from-[#1e4a38]/80 to-white/[0.05] backdrop-blur-xl border border-white/15 hover:border-[#1ed760]/40 p-4 rounded-2xl cursor-pointer hover:-translate-y-0.5 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] shadow-md hover:shadow-xl"
         >
           <div className="flex items-center justify-between text-xs font-bold text-white mb-2">
             <span>Lyrics</span>
@@ -206,6 +218,7 @@ export const NowPlayingDrawer: React.FC<NowPlayingDrawerProps> = ({
           )}
         </div>
       )}
-    </aside>
+      </aside>
+    </div>
   );
 };

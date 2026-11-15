@@ -9,6 +9,7 @@ import {
   DEFAULT_COVER_SVG,
 } from '../services/musicApi';
 import { CoverArt } from './CoverArt';
+import { handleSpotlightMove } from '../utils/hoverSpotlight';
 
 interface DetailViewProps {
   viewState: ViewState;
@@ -144,20 +145,20 @@ export const DetailView: React.FC<DetailViewProps> = ({
   const totalDurationSeconds = tracks.reduce((acc, t) => acc + t.duration, 0);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl relative no-scrollbar flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+    <div className="flex-1 overflow-y-auto overflow-x-hidden bg-white/[0.04] backdrop-blur-lg border border-white/10 rounded-2xl md:rounded-3xl relative no-scrollbar flex flex-col shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
       {/* Header Banner with Ambient Gradient */}
       <div
-        className={`p-6 pt-12 pb-8 flex flex-col md:flex-row items-end gap-6 bg-gradient-to-b ${ambientGradient} via-black/30 to-transparent transition-colors`}
+        className={`p-4 pt-6 pb-6 sm:p-6 sm:pt-12 sm:pb-8 flex flex-col md:flex-row items-center md:items-end text-center md:text-left gap-4 sm:gap-6 bg-gradient-to-b ${ambientGradient} via-black/30 to-transparent transition-colors`}
       >
-        <div className="relative shrink-0 shadow-2xl">
+        <div className="relative shrink-0 shadow-2xl group">
           {viewState.type === 'playlist' && viewState.id === 'playlist-liked' ? (
-            <div className="w-44 h-44 sm:w-52 sm:h-52 rounded-2xl bg-gradient-to-br from-[#450af5]/90 to-[#8e8ee5]/90 ring-1 ring-white/25 flex items-center justify-center shadow-2xl relative overflow-hidden">
+            <div className="w-36 h-36 sm:w-52 sm:h-52 rounded-2xl bg-gradient-to-br from-[#450af5]/90 to-[#8e8ee5]/90 ring-1 ring-white/25 flex items-center justify-center shadow-2xl relative overflow-hidden transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]">
               <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-white/25 pointer-events-none" />
-              <Heart className="w-20 h-20 text-white fill-white relative z-10" />
+              <Heart className="w-16 h-16 sm:w-20 sm:h-20 text-white fill-white relative z-10 transition-transform duration-300 group-hover:scale-110" />
             </div>
           ) : (
             <div
-              className={`relative w-44 h-44 sm:w-52 sm:h-52 overflow-hidden ring-1 ring-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] ${
+              className={`relative w-36 h-36 sm:w-52 sm:h-52 overflow-hidden ring-1 ring-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] ${
                 viewState.type === 'artist' ? 'rounded-full' : 'rounded-2xl'
               }`}
             >
@@ -165,13 +166,13 @@ export const DetailView: React.FC<DetailViewProps> = ({
                 src={coverUrl}
                 fallbackSrc={fallbackCoverUrl}
                 alt={title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
           )}
         </div>
 
-        <div className="flex flex-col gap-2 z-10 w-full min-w-0">
+        <div className="flex flex-col items-center md:items-start gap-2 z-10 w-full min-w-0">
           <span className="text-xs font-bold uppercase tracking-wider text-white">
             {typeLabel}
           </span>
@@ -195,17 +196,17 @@ export const DetailView: React.FC<DetailViewProps> = ({
       </div>
 
       {/* Action Bar */}
-      <div className="px-6 py-4 flex items-center gap-6 bg-[#121212]/40 backdrop-blur-md sticky top-0 z-20">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-4 sm:gap-6 bg-[#121212]/40 backdrop-blur-md sticky top-0 z-20">
         <button
           onClick={() => onPlayCollection(tracks)}
           disabled={tracks.length === 0}
           aria-label={isCollectionPlaying ? 'Pause' : 'Play'}
-          className="w-14 h-14 rounded-full bg-[#1ed760] text-black shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#1ed760] text-black shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
         >
           {isCollectionPlaying ? (
-            <Pause className="w-7 h-7 fill-current" />
+            <Pause className="w-6 h-6 sm:w-7 sm:h-7 fill-current" />
           ) : (
-            <Play className="w-7 h-7 fill-current translate-x-0.5" />
+            <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-current translate-x-0.5" />
           )}
         </button>
 
@@ -213,27 +214,27 @@ export const DetailView: React.FC<DetailViewProps> = ({
           aria-label="Save to Your Library"
           className="text-[#b3b3b3] hover:text-white transition-colors cursor-pointer p-1"
         >
-          <Heart className="w-8 h-8 hover:scale-105 transition-transform" />
+          <Heart className="w-7 h-7 sm:w-8 sm:h-8 hover:scale-105 transition-transform" />
         </button>
 
         <button
           aria-label="Download"
           className="text-[#b3b3b3] hover:text-white transition-colors cursor-pointer p-1"
         >
-          <ArrowDownCircle className="w-8 h-8 hover:scale-105 transition-transform" />
+          <ArrowDownCircle className="w-7 h-7 sm:w-8 sm:h-8 hover:scale-105 transition-transform" />
         </button>
 
         <button
           aria-label="More options"
           className="text-[#b3b3b3] hover:text-white transition-colors cursor-pointer p-1"
         >
-          <MoreHorizontal className="w-7 h-7 hover:scale-105 transition-transform" />
+          <MoreHorizontal className="w-6 h-6 sm:w-7 sm:h-7 hover:scale-105 transition-transform" />
         </button>
       </div>
 
       {/* Song Table */}
-      <div className="px-6 pb-12 flex-1">
-        <div className="grid grid-cols-[16px_1fr_120px] md:grid-cols-[16px_4fr_3fr_2fr_80px] gap-4 px-4 py-2 border-b border-[#282828] text-xs font-medium text-[#a7a7a7] uppercase tracking-wider mb-2">
+      <div className="px-3 sm:px-6 pb-10 flex-1">
+        <div className="grid grid-cols-[20px_1fr_auto] md:grid-cols-[16px_4fr_3fr_2fr_80px] gap-3 sm:gap-4 px-2.5 sm:px-4 py-2 border-b border-[#282828] text-xs font-medium text-[#a7a7a7] uppercase tracking-wider mb-2">
           <span>#</span>
           <span>Title</span>
           <span className="hidden md:inline">Album</span>
@@ -262,8 +263,9 @@ export const DetailView: React.FC<DetailViewProps> = ({
               return (
                 <div
                   key={`${track.id}-${idx}`}
+                  onMouseMove={handleSpotlightMove}
                   onClick={() => onPlayTrack(track, tracks)}
-                  className={`group grid grid-cols-[16px_1fr_120px] md:grid-cols-[16px_4fr_3fr_2fr_80px] gap-4 px-4 py-2.5 rounded-xl border border-transparent hover:bg-white/[0.08] hover:border-white/10 transition-all items-center cursor-pointer ${
+                  className={`group hover-spotlight grid grid-cols-[20px_1fr_auto] md:grid-cols-[16px_4fr_3fr_2fr_80px] gap-3 sm:gap-4 px-2.5 sm:px-4 py-2.5 rounded-xl border border-transparent hover:bg-white/[0.09] hover:border-white/15 transition-all duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:translate-x-0.5 items-center cursor-pointer ${
                     isThisTrackCurrent ? 'bg-white/[0.1] border-white/15' : ''
                   }`}
                 >
@@ -281,7 +283,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
                         onPlayTrack(track, tracks);
                       }}
                       aria-label={`Play ${track.title}`}
-                      className="hidden group-hover:block text-white hover:scale-110 transition-transform"
+                      className="hidden group-hover:block text-white hover:text-[#1ed760] hover:scale-110 transition-all duration-150 cursor-pointer"
                     >
                       {isThisTrackPlaying ? (
                         <Pause className="w-4 h-4 fill-current" />
@@ -297,7 +299,7 @@ export const DetailView: React.FC<DetailViewProps> = ({
                         src={track.coverUrl}
                         fallbackSrc={track.fallbackCoverUrl}
                         alt={track.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
                       />
                     </div>
                     <div className="flex flex-col min-w-0">
